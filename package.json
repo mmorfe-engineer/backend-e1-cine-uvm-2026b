@@ -11,6 +11,7 @@
   "authors": "Martín Morfe (8263711), Martín Alejandro Carballo (30539018)",
   "license": "MIT",
   "dependencies": {
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
     "uuid": "^9.0.0"
   },
