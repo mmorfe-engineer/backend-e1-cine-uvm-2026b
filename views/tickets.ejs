@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets - Sistema de Gestión de Cine</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #667eea; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .btn { padding: 5px 10px; border: none; cursor: pointer; border-radius: 3px; }
+        .btn-edit { background: #007bff; color: white; }
+        .btn-delete { background: #dc3545; color: white; }
+        .status { padding: 4px 8px; border-radius: 3px; }
+        .available { background: #28a745; color: white; }
+        .reserved { background: #ffc107; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>🎫 Tickets (Entradas)</h1>
+    <p><a href="/">← Volver al inicio</a></p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Función ID</th>
+                <th>Asiento</th>
+                <th>Precio ($)</th>
+                <th>Estado</th>
+                <th>Creado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (tickets && tickets.length > 0) { %>
+                <% tickets.forEach(ticket => { %>
+                    <tr>
+                        <td><%= ticket.id.substring(0, 8) %>...</td>
+                        <td><%= ticket.functionId.substring(0, 8) %>...</td>
+                        <td><strong><%= ticket.seatNumber %></strong></td>
+                        <td><%= ticket.price.toFixed(2) %></td>
+                        <td>
+                            <span class="status <%= ticket.status === 'available' ? 'available' : 'reserved' %>">
+                                <%= ticket.status.toUpperCase() %>
+                            </span>
+                        </td>
+                        <td><%= new Date(ticket.createdAt).toLocaleDateString() %></td>
+                        <td>
+                            <button class="btn btn-edit">Editar</button>
+                            <button class="btn btn-delete">Eliminar</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #999;">No hay tickets registrados</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</body>
+</html>

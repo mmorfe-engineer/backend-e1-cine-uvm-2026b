@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funciones - Sistema de Gestión de Cine</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #667eea; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .btn { padding: 5px 10px; border: none; cursor: pointer; border-radius: 3px; }
+        .btn-edit { background: #007bff; color: white; }
+        .btn-delete { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🎞️ Funciones (Proyecciones)</h1>
+    <p><a href="/">← Volver al inicio</a></p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Película ID</th>
+                <th>Sala ID</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Creado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (functions && functions.length > 0) { %>
+                <% functions.forEach(fn => { %>
+                    <tr>
+                        <td><%= fn.id.substring(0, 8) %>...</td>
+                        <td><%= fn.movieId.substring(0, 8) %>...</td>
+                        <td><%= fn.roomId %></td>
+                        <td><%= fn.date %></td>
+                        <td><%= fn.time %></td>
+                        <td><%= new Date(fn.createdAt).toLocaleDateString() %></td>
+                        <td>
+                            <button class="btn btn-edit">Editar</button>
+                            <button class="btn btn-delete">Eliminar</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #999;">No hay funciones registradas</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</body>
+</html>
