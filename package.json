@@ -1,0 +1,21 @@
+{
+  "name": "backend-cine-uvm-2026b",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión de Cine - Universidad Valle del Momboy",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "keywords": ["cine", "backend", "rest-api", "express", "node.js"],
+  "authors": "Martín Morfe (8263711), Martín Alejandro Carballo (30539018)",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}
