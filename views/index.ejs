@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Cine - UVM Backend 2026B</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .authors {
+            color: #999;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .emoji {
+            font-size: 1.2em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: white;
+        }
+        
+        .get {
+            background: #28a745;
+        }
+        
+        .post {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .put {
+            background: #007bff;
+        }
+        
+        .delete {
+            background: #dc3545;
+        }
+        
+        .endpoint {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.95em;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Sistema de Gestión de Cine</h1>
+            <p class="subtitle">Universidad Valle del Momboy - Backend 2026B</p>
+            <p class="subtitle">REST API con Node.js + Express</p>
+            <p class="authors">
+                <strong>Autores:</strong> Martín Morfe (8263711) & Martín Alejandro Carballo (30539018)
+            </p>
+            <div class="badges">
+                <span class="badge">Node.js</span>
+                <span class="badge">Express.js</span>
+                <span class="badge">UUID v4</span>
+                <span class="badge">EJS</span>
+                <span class="badge">REST API</span>
+            </div>
+        </header>
+
+        <div class="info-box">
+            ✅ Servidor funcionando correctamente en http://localhost:3000 | Todos los endpoints están operativos
+        </div>
+
+        <!-- PELÍCULAS -->
+        <div class="section">
+            <h2 class="section-title"><span class="emoji">🎬</span> PELÍCULAS (Movies)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Endpoint</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/movies</td>
+                        <td>Listar todas las películas</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/movies/:id</td>
+                        <td>Obtener película por ID</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/movies</td>
+                        <td>Crear nueva película</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td class="endpoint">/movies/:id</td>
+                        <td>Actualizar película</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td class="endpoint">/movies/:id</td>
+                        <td>Eliminar película</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FUNCIONES -->
+        <div class="section">
+            <h2 class="section-title"><span class="emoji">🎞️</span> FUNCIONES (Proyecciones)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Endpoint</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/functions</td>
+                        <td>Listar todas las funciones</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/functions/last5</td>
+                        <td>Últimas 5 funciones (descendente)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/functions/range</td>
+                        <td>Funciones por rango de fechas (?start=&end=)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/functions/:id</td>
+                        <td>Obtener función por ID</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/functions</td>
+                        <td>Crear nueva función</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td class="endpoint">/functions/:id</td>
+                        <td>Actualizar función</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td class="endpoint">/functions/:id</td>
+                        <td>Eliminar función</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TICKETS -->
+        <div class="section">
+            <h2 class="section-title"><span class="emoji">🎫</span> TICKETS (Entradas)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Endpoint</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/tickets</td>
+                        <td>Listar todos los tickets</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/tickets/:functionId</td>
+                        <td>Tickets de una función específica</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/tickets</td>
+                        <td>Crear nuevo ticket</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/tickets/:id/reserve</td>
+                        <td>Reservar un ticket</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td class="endpoint">/tickets/:id</td>
+                        <td>Actualizar ticket</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td class="endpoint">/tickets/:id</td>
+                        <td>Eliminar ticket</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SALAS -->
+        <div class="section">
+            <h2 class="section-title"><span class="emoji">🚪</span> SALAS (Rooms)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Endpoint</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/rooms</td>
+                        <td>Listar todas las salas</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/rooms/:id</td>
+                        <td>Obtener sala por ID</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/rooms</td>
+                        <td>Crear nueva sala</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td class="endpoint">/rooms/:id</td>
+                        <td>Actualizar sala</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td class="endpoint">/rooms/:id</td>
+                        <td>Eliminar sala</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- RESERVACIONES -->
+        <div class="section">
+            <h2 class="section-title"><span class="emoji">📝</span> RESERVACIONES</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Endpoint</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/reservations</td>
+                        <td>Listar todas las reservaciones</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td class="endpoint">/reservations/:id</td>
+                        <td>Obtener reservación por ID</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/reservations</td>
+                        <td>Crear nueva reservación</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td class="endpoint">/reservations/:id</td>
+                        <td>Actualizar reservación</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td class="endpoint">/reservations/:id/cancel</td>
+                        <td>Cancelar reservación</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td class="endpoint">/reservations/:id</td>
+                        <td>Eliminar reservación</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p><strong>Sistema de Gestión de Cine © 2026</strong></p>
+            <p>Universidad Valle del Momboy | Cátedra Backend 2026B | Caracas, Venezuela</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                📧 Autores: Martín Morfe & Martín Alejandro Carballo | 
+                🔗 GitHub: https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
