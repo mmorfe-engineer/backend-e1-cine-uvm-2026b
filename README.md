@@ -285,7 +285,7 @@ backend-cine-uvm-final/
 
 ## 📄 Licencia
 
-MIT License - Uso académico permitido
+Uso académico permitido
 
 ---
 
