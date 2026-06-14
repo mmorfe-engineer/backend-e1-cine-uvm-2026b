@@ -1,156 +1,58 @@
-const Function = require('../models/Function');
-const Ticket = require('../models/Ticket');
+'use strict';
+const CineFunction = require('../models/Function');
 
 class FunctionController {
-  static getAll(req, res) {
-    const allFunctions = Function.getAll();
-    res.status(200).json({
-      success: true,
-      count: allFunctions.length,
-      data: allFunctions
-    });
+  static async getAll(req, res) {
+    try { const data = await CineFunction.findAll(); res.status(200).json({ success:true, count:data.length, data }); }
+    catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static getById(req, res) {
-    const { id } = req.params;
-    const fn = Function.getById(id);
-
-    if (!fn) {
-      return res.status(404).json({
-        success: false,
-        error: 'Función no encontrada',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: fn
-    });
+  static async getLast5(req, res) {
+    try { const data = await CineFunction.getLast5(); res.status(200).json({ success:true, count:data.length, data }); }
+    catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static create(req, res) {
-    const { movieId, roomId, date, time } = req.body;
-
-    if (!movieId || !roomId || !date || !time) {
-      return res.status(400).json({
-        success: false,
-        error: 'Faltan campos requeridos',
-        required: ['movieId', 'roomId', 'date', 'time']
-      });
-    }
-
-    const newFunction = new Function(movieId, roomId, date, time);
-    Function.add(newFunction);
-
-    res.status(201).json({
-      success: true,
-      message: 'Función creada exitosamente',
-      data: newFunction
-    });
+  static async getByDateRange(req, res) {
+    try {
+      const { start, end } = req.query;
+      if (!start || !end) return res.status(400).json({ success:false, error:'Se requieren ?start=YYYY-MM-DD&end=YYYY-MM-DD' });
+      const data = await CineFunction.getByDateRange(start, end);
+      res.status(200).json({ success:true, count:data.length, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static getLast5(req, res) {
-    const last5 = Function.getLast5();
-    res.status(200).json({
-      success: true,
-      count: last5.length,
-      data: last5
-    });
+  static async getById(req, res) {
+    try {
+      const data = await CineFunction.findById(req.params.id);
+      if (!data) return res.status(404).json({ success:false, error:'Función no encontrada' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static getByDateRange(req, res) {
-    const { start, end } = req.query;
-
-    if (!start || !end) {
-      return res.status(400).json({
-        success: false,
-        error: 'Parámetros requeridos: start y end',
-        example: '?start=2026-06-01&end=2026-06-30'
-      });
-    }
-
-    const functions = Function.getByDateRange(start, end);
-
-    res.status(200).json({
-      success: true,
-      range: { start, end },
-      count: functions.length,
-      data: functions
-    });
+  static async create(req, res) {
+    try {
+      const { room_id, date, time, price, available_seats } = req.body;
+      if (!room_id||!date||!time||!price||!available_seats) return res.status(400).json({ success:false, error:'Faltan campos requeridos' });
+      const data = await CineFunction.create(req.body);
+      res.status(201).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static update(req, res) {
-    const { id } = req.params;
-    const { movieId, roomId, date, time } = req.body;
-
-    if (!movieId || !roomId || !date || !time) {
-      return res.status(400).json({
-        success: false,
-        error: 'Faltan campos requeridos para actualizar'
-      });
-    }
-
-    const updated = Function.update(id, movieId, roomId, date, time);
-
-    if (!updated) {
-      return res.status(404).json({
-        success: false,
-        error: 'Función no encontrada',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Función actualizada exitosamente',
-      data: updated
-    });
+  static async update(req, res) {
+    try {
+      const data = await CineFunction.update(req.params.id, req.body);
+      if (!data) return res.status(404).json({ success:false, error:'Función no encontrada' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static delete(req, res) {
-    const { id } = req.params;
-
-    const deleted = Function.delete(id);
-
-    if (!deleted) {
-      return res.status(404).json({
-        success: false,
-        error: 'Función no encontrada',
-        id: id
-      });
-    }
-
-    // Eliminar tickets asociados
-    Ticket.deleteByFunction(id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Función eliminada exitosamente',
-      deletedId: id
-    });
+  static async unlinkMovie(req, res) {
+    try {
+      const data = await CineFunction.unlinkMovie(req.params.id);
+      if (!data) return res.status(404).json({ success:false, error:'Función no encontrada' });
+      res.status(200).json({ success:true, message:'Película desvinculada', data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static deleteByMovie(req, res) {
-    const { id, movieId } = req.params;
-
-    const fn = Function.getById(id);
-    if (!fn) {
-      return res.status(404).json({
-        success: false,
-        error: 'Función no encontrada'
-      });
-    }
-
-    Function.delete(id);
-    Ticket.deleteByFunction(id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Función y sus tickets eliminados',
-      deletedId: id
-    });
+  static async delete(req, res) {
+    try {
+      const ok = await CineFunction.delete(req.params.id);
+      if (!ok) return res.status(404).json({ success:false, error:'Función no encontrada' });
+      res.status(200).json({ success:true, message:'Función eliminada' });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
 }
-
 module.exports = FunctionController;

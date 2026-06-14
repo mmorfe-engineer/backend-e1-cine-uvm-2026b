@@ -1,105 +1,58 @@
+'use strict';
 const Movie = require('../models/Movie');
-const Function = require('../models/Function');
 
 class MovieController {
-  static getAll(req, res) {
-    const allMovies = Movie.getAll();
-    res.status(200).json({
-      success: true,
-      count: allMovies.length,
-      data: allMovies
-    });
+  static async getAll(req, res) {
+    try { const data = await Movie.findAll(); res.status(200).json({ success:true, count:data.length, data }); }
+    catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static getById(req, res) {
-    const { id } = req.params;
-    const movie = Movie.getById(id);
-    
-    if (!movie) {
-      return res.status(404).json({
-        success: false,
-        error: 'Película no encontrada',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: movie
-    });
+  static async getById(req, res) {
+    try {
+      const data = await Movie.findById(req.params.id);
+      if (!data) return res.status(404).json({ success:false, error:'Película no encontrada' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static create(req, res) {
-    const { title, duration } = req.body;
-
-    if (!title || !duration) {
-      return res.status(400).json({
-        success: false,
-        error: 'Faltan campos requeridos',
-        required: ['title', 'duration']
-      });
-    }
-
-    const newMovie = new Movie(title, duration);
-    Movie.add(newMovie);
-
-    res.status(201).json({
-      success: true,
-      message: 'Película creada exitosamente',
-      data: newMovie
-    });
+  static async getWithFunctions(req, res) {
+    try {
+      const data = await Movie.findWithFunctions(req.params.id);
+      if (!data) return res.status(404).json({ success:false, error:'Película no encontrada' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static update(req, res) {
-    const { id } = req.params;
-    const { title, duration } = req.body;
-
-    if (!title || !duration) {
-      return res.status(400).json({
-        success: false,
-        error: 'Faltan campos requeridos para actualizar'
-      });
-    }
-
-    const updated = Movie.update(id, title, duration);
-
-    if (!updated) {
-      return res.status(404).json({
-        success: false,
-        error: 'Película no encontrada',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Película actualizada exitosamente',
-      data: updated
-    });
+  static async create(req, res) {
+    try {
+      const { title, duration } = req.body;
+      if (!title || !duration) return res.status(400).json({ success:false, error:'title y duration son requeridos' });
+      const data = await Movie.create(req.body);
+      res.status(201).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static delete(req, res) {
-    const { id } = req.params;
-
-    const deleted = Movie.delete(id);
-
-    if (!deleted) {
-      return res.status(404).json({
-        success: false,
-        error: 'Película no encontrada',
-        id: id
-      });
-    }
-
-    // Eliminar funciones asociadas
-    Function.deleteByMovie(id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Película eliminada exitosamente',
-      deletedId: id
-    });
+  static async update(req, res) {
+    try {
+      const data = await Movie.update(req.params.id, req.body);
+      if (!data) return res.status(404).json({ success:false, error:'Película no encontrada' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
+  }
+  static async delete(req, res) {
+    try {
+      const ok = await Movie.delete(req.params.id);
+      if (!ok) return res.status(404).json({ success:false, error:'Película no encontrada' });
+      res.status(200).json({ success:true, message:'Película eliminada' });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
+  }
+  static async viewList(req, res) {
+    try { const movies = await Movie.findAll(); res.render('movies/list', { title:'Gestión de Películas', movies }); }
+    catch(err) { res.status(500).send(err.message); }
+  }
+  static async viewNew(req, res) { res.render('movies/new', { title:'Nueva Película' }); }
+  static async viewEdit(req, res) {
+    try {
+      const movie = await Movie.findById(req.params.id);
+      if (!movie) return res.redirect('/movies/view');
+      res.render('movies/edit', { title:'Editar Película', movie });
+    } catch(err) { res.status(500).send(err.message); }
   }
 }
-
 module.exports = MovieController;
