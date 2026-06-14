@@ -1,49 +1,41 @@
+'use strict';
 const { v4: uuidv4 } = require('uuid');
-
-let rooms = [];
+const pool = require('../config/db');
 
 class Room {
-  constructor(name, capacity) {
-    this.id = uuidv4();
-    this.name = name;
-    this.capacity = capacity;
-    this.createdAt = new Date().toISOString();
+  static async create({ name, capacity, type, has_accessibility }) {
+    const id = uuidv4();
+    await pool.query(
+      'INSERT INTO rooms (id,name,capacity,type,has_accessibility) VALUES (?,?,?,?,?)',
+      [id, name, capacity, type||'Regular', has_accessibility ? 1 : 0]
+    );
+    return Room.findById(id);
   }
 
-  static getAll() {
-    return rooms;
+  static async findAll() {
+    const [rows] = await pool.query('SELECT * FROM rooms WHERE is_active=1 ORDER BY name ASC');
+    return rows;
   }
 
-  static getById(id) {
-    return rooms.find(r => r.id === id);
+  static async findById(id) {
+    const [rows] = await pool.query('SELECT * FROM rooms WHERE id=? AND is_active=1', [id]);
+    return rows[0] || null;
   }
 
-  static add(room) {
-    rooms.push(room);
-    return room;
+  static async update(id, { name, capacity, type, has_accessibility }) {
+    const [result] = await pool.query(
+      `UPDATE rooms SET name=COALESCE(?,name), capacity=COALESCE(?,capacity),
+        type=COALESCE(?,type), has_accessibility=COALESCE(?,has_accessibility)
+       WHERE id=? AND is_active=1`,
+      [name, capacity, type, has_accessibility !== undefined ? (has_accessibility ? 1 : 0) : null, id]
+    );
+    if (result.affectedRows === 0) return null;
+    return Room.findById(id);
   }
 
-  static getByName(name) {
-    return rooms.find(r => r.name === name);
-  }
-
-  static update(id, name, capacity) {
-    const room = rooms.find(r => r.id === id);
-    if (room) {
-      room.name = name;
-      room.capacity = capacity;
-      room.updatedAt = new Date().toISOString();
-      return room;
-    }
-    return null;
-  }
-
-  static delete(id) {
-    const index = rooms.findIndex(r => r.id === id);
-    if (index > -1) {
-      return rooms.splice(index, 1)[0];
-    }
-    return null;
+  static async delete(id) {
+    const [result] = await pool.query('UPDATE rooms SET is_active=0 WHERE id=? AND is_active=1', [id]);
+    return result.affectedRows > 0;
   }
 }
 

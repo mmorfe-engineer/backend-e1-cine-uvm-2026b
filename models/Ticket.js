@@ -1,65 +1,58 @@
+'use strict';
 const { v4: uuidv4 } = require('uuid');
-
-let tickets = [];
+const pool = require('../config/db');
 
 class Ticket {
-  constructor(functionId, seatNumber, price) {
-    this.id = uuidv4();
-    this.functionId = functionId;
-    this.seatNumber = seatNumber;
-    this.price = price;
-    this.status = 'available';
-    this.createdAt = new Date().toISOString();
+  static async create({ function_id, seat_number, price, holder_name }) {
+    const id = uuidv4();
+    await pool.query(
+      'INSERT INTO tickets (id,function_id,seat_number,price,holder_name) VALUES (?,?,?,?,?)',
+      [id, function_id, seat_number, price, holder_name||null]
+    );
+    return Ticket.findById(id);
   }
 
-  static getAll() {
-    return tickets;
+  static async findAll() {
+    const [rows] = await pool.query(`
+      SELECT t.*, f.date AS function_date, f.time AS function_time, m.title AS movie_title, r.name AS room_name
+      FROM tickets t
+      JOIN functions f ON t.function_id=f.id
+      LEFT JOIN movies m ON f.movie_id=m.id
+      JOIN rooms r ON f.room_id=r.id
+      ORDER BY t.created_at DESC`);
+    return rows;
   }
 
-  static getById(id) {
-    return tickets.find(t => t.id === id);
+  static async findById(id) {
+    const [rows] = await pool.query('SELECT * FROM tickets WHERE id=?', [id]);
+    return rows[0] || null;
   }
 
-  static add(ticket) {
-    tickets.push(ticket);
-    return ticket;
+  static async findByFunction(function_id) {
+    const [rows] = await pool.query('SELECT * FROM tickets WHERE function_id=? ORDER BY seat_number ASC', [function_id]);
+    return rows;
   }
 
-  static getByFunction(functionId) {
-    return tickets.filter(t => t.functionId === functionId);
+  static async update(id, { seat_number, price, status, holder_name }) {
+    const [result] = await pool.query(
+      'UPDATE tickets SET seat_number=COALESCE(?,seat_number), price=COALESCE(?,price), status=COALESCE(?,status), holder_name=COALESCE(?,holder_name) WHERE id=?',
+      [seat_number, price, status, holder_name, id]
+    );
+    if (result.affectedRows === 0) return null;
+    return Ticket.findById(id);
   }
 
-  static reserve(id) {
-    const ticket = tickets.find(t => t.id === id);
-    if (ticket && ticket.status === 'available') {
-      ticket.status = 'reserved';
-      ticket.reservedAt = new Date().toISOString();
-      return ticket;
-    }
-    return null;
+  static async delete(id) {
+    const [result] = await pool.query('DELETE FROM tickets WHERE id=?', [id]);
+    return result.affectedRows > 0;
   }
 
-  static update(id, seatNumber, price) {
-    const ticket = tickets.find(t => t.id === id);
-    if (ticket) {
-      ticket.seatNumber = seatNumber;
-      ticket.price = price;
-      ticket.updatedAt = new Date().toISOString();
-      return ticket;
-    }
-    return null;
-  }
-
-  static delete(id) {
-    const index = tickets.findIndex(t => t.id === id);
-    if (index > -1) {
-      return tickets.splice(index, 1)[0];
-    }
-    return null;
-  }
-
-  static deleteByFunction(functionId) {
-    tickets = tickets.filter(t => t.functionId !== functionId);
+  static async reserve(id) {
+    const [result] = await pool.query(
+      "UPDATE tickets SET status='reserved' WHERE id=? AND status='available'", [id]
+    );
+    if (result.affectedRows === 0) return null;
+    return Ticket.findById(id);
   }
 }
 
