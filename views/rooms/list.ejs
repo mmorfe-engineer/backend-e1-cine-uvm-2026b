@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>🚪 <%= title %></h1>
+    <p>Sistema de Gestión de Cine - UVM Backend 2026B</p>
+  </div>
+
+  <div class="nav">
+    <a href="/">🏠 Inicio</a>
+    <a href="/rooms/view/new">➕ Nueva Sala</a>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2>📋 Lista de Salas</h2>
+      
+      <% if (rooms && rooms.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Accesibilidad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rooms.forEach(room => { %>
+          <tr>
+            <td><%= room.id.substring(0, 8) %>...</td>
+            <td><strong><%= room.name %></strong></td>
+            <td><%= room.type %></td>
+            <td><%= room.capacity %></td>
+            <td><%= room.has_accessibility ? '✅ Sí' : '❌ No' %></td>
+            <td><%= room.is_active ? '✅ Activa' : '❌ Inactiva' %></td>
+            <td>
+              <a href="/rooms/view/<%= room.id %>/edit" class="btn btn-warning btn-sm">✏️ Editar</a>
+              <form action="/rooms/<%= room.id %>&_method=DELETE" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar sala <%= room.name %>?')">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <% } else { %>
+      <div class="card">
+        <p>No hay salas registradas. <a href="/rooms/view/new">Crear una nueva sala</a>.</p>
+      </div>
+      <% } %>
+      
+      <a href="/rooms/view/new" class="btn btn-primary">➕ Nueva Sala</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>Sistema de Gestión de Cine - UVM 2026B</p>
+  </footer>
+</body>
+</html>

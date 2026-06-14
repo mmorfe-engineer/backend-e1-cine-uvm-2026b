@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>🎬 <%= title %></h1>
+    <p>Sistema de Gestión de Cine - UVM Backend 2026B</p>
+  </div>
+
+  <div class="nav">
+    <a href="/">🏠 Inicio</a>
+    <a href="/movies/view">📋 Lista de Películas</a>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2>✏️ Editar Película: <%= movie.title %></h2>
+      
+      <div class="card">
+        <form action="/movies/<%= movie.id %>&_method=PUT" method="POST">
+          <div class="form-group">
+            <label for="title">* Título:</label>
+            <input type="text" id="title" name="title" required value="<%= movie.title %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="duration">* Duración (minutos):</label>
+            <input type="number" id="duration" name="duration" required min="1" value="<%= movie.duration %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="genre">Género:</label>
+            <select id="genre" name="genre">
+              <option value="">-- Seleccionar --</option>
+              <option value="Ciencia Ficción" <%= movie.genre === 'Ciencia Ficción' ? 'selected' : '' %>>Ciencia Ficción</option>
+              <option value="Acción" <%= movie.genre === 'Acción' ? 'selected' : '' %>>Acción</option>
+              <option value="Aventura" <%= movie.genre === 'Aventura' ? 'selected' : '' %>>Aventura</option>
+              <option value="Drama" <%= movie.genre === 'Drama' ? 'selected' : '' %>>Drama</option>
+              <option value="Comedia" <%= movie.genre === 'Comedia' ? 'selected' : '' %>>Comedia</option>
+              <option value="Terror" <%= movie.genre === 'Terror' ? 'selected' : '' %>>Terror</option>
+              <option value="Thriller" <%= movie.genre === 'Thriller' ? 'selected' : '' %>>Thriller</option>
+              <option value="Animación" <%= movie.genre === 'Animación' ? 'selected' : '' %>>Animación</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="rating">Clasificación:</label>
+            <select id="rating" name="rating">
+              <option value="G" <%= movie.rating === 'G' ? 'selected' : '' %>>G</option>
+              <option value="PG" <%= movie.rating === 'PG' ? 'selected' : '' %>>PG</option>
+              <option value="PG-13" <%= movie.rating === 'PG-13' ? 'selected' : '' %>>PG-13</option>
+              <option value="R" <%= movie.rating === 'R' ? 'selected' : '' %>>R</option>
+              <option value="NC-17" <%= movie.rating === 'NC-17' ? 'selected' : '' %>>NC-17</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="director">Director:</label>
+            <input type="text" id="director" name="director" value="<%= movie.director || '' %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="release_year">Año de lanzamiento:</label>
+            <input type="number" id="release_year" name="release_year" min="1900" max="2100" value="<%= movie.release_year || '' %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="synopsis">Sinopsis:</label>
+            <textarea id="synopsis" name="synopsis"><%= movie.synopsis || '' %></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="poster_url">URL del póster:</label>
+            <input type="url" id="poster_url" name="poster_url" value="<%= movie.poster_url || '' %>">
+          </div>
+          
+          <input type="hidden" name="_method" value="PUT">
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">💾 Actualizar Película</button>
+            <a href="/movies/view" class="btn btn-secondary">🚫 Cancelar</a>
+          </div>
+          
+          <p style="margin-top: 15px; color: var(--muted); font-size: 0.85rem;">
+            * Campos requeridos | Creado: <%= new Date(movie.created_at).toLocaleString() %>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Sistema de Gestión de Cine - UVM 2026B</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>🎬 <%= title %></h1>
+    <p>Sistema de Gestión de Cine - UVM Backend 2026B</p>
+  </div>
+
+  <div class="nav">
+    <a href="/">🏠 Inicio</a>
+    <a href="/movies/view/new">➕ Nueva Película</a>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2>📋 Lista de Películas</h2>
+      
+      <% if (movies && movies.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Género</th>
+            <th>Duración (min)</th>
+            <th>Clasificación</th>
+            <th>Año</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% movies.forEach(movie => { %>
+          <tr>
+            <td><%= movie.id.substring(0, 8) %>...</td>
+            <td><strong><%= movie.title %></strong></td>
+            <td><%= movie.genre %></td>
+            <td><%= movie.duration %></td>
+            <td><%= movie.rating %></td>
+            <td><%= movie.release_year || 'N/A' %></td>
+            <td>
+              <a href="/movies/view/<%= movie.id %>/edit" class="btn btn-warning btn-sm">✏️ Editar</a>
+              <form action="/movies/<%= movie.id %>" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar película <%= movie.title %>?')">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <% } else { %>
+      <div class="card">
+        <p>No hay películas registradas. <a href="/movies/view/new">Crear una nueva película</a>.</p>
+      </div>
+      <% } %>
+      
+      <a href="/movies/view/new" class="btn btn-primary">➕ Nueva Película</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>Sistema de Gestión de Cine - UVM 2026B</p>
+  </footer>
+</body>
+</html>
