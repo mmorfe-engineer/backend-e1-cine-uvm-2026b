@@ -1,137 +1,53 @@
+'use strict';
 const Ticket = require('../models/Ticket');
-const Reservation = require('../models/Reservation');
 
 class TicketController {
-  static getAll(req, res) {
-    const allTickets = Ticket.getAll();
-    res.status(200).json({
-      success: true,
-      count: allTickets.length,
-      data: allTickets
-    });
+  static async getAll(req, res) {
+    try { const data = await Ticket.findAll(); res.status(200).json({ success:true, count:data.length, data }); }
+    catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static getById(req, res) {
-    const { id } = req.params;
-    const ticket = Ticket.getById(id);
-
-    if (!ticket) {
-      return res.status(404).json({
-        success: false,
-        error: 'Ticket no encontrado',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: ticket
-    });
+  static async getById(req, res) {
+    try {
+      const data = await Ticket.findById(req.params.id);
+      if (!data) return res.status(404).json({ success:false, error:'Ticket no encontrado' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static getByFunction(req, res) {
-    const { functionId } = req.params;
-    const tickets = Ticket.getByFunction(functionId);
-
-    res.status(200).json({
-      success: true,
-      functionId: functionId,
-      count: tickets.length,
-      data: tickets
-    });
+  static async getByFunction(req, res) {
+    try { const data = await Ticket.findByFunction(req.params.functionId); res.status(200).json({ success:true, count:data.length, data }); }
+    catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static create(req, res) {
-    const { functionId, seatNumber, price } = req.body;
-
-    if (!functionId || !seatNumber || !price) {
-      return res.status(400).json({
-        success: false,
-        error: 'Faltan campos requeridos',
-        required: ['functionId', 'seatNumber', 'price']
-      });
+  static async create(req, res) {
+    try {
+      const { function_id, seat_number, price } = req.body;
+      if (!function_id||!seat_number||!price) return res.status(400).json({ success:false, error:'function_id, seat_number y price son requeridos' });
+      const data = await Ticket.create(req.body);
+      res.status(201).json({ success:true, data });
+    } catch(err) {
+      if (err.code==='ER_DUP_ENTRY') return res.status(409).json({ success:false, error:'Asiento ya existe en esta función' });
+      res.status(500).json({ success:false, error:err.message });
     }
-
-    const newTicket = new Ticket(functionId, seatNumber, price);
-    Ticket.add(newTicket);
-
-    res.status(201).json({
-      success: true,
-      message: 'Ticket creado exitosamente',
-      data: newTicket
-    });
   }
-
-  static reserve(req, res) {
-    const { id } = req.params;
-
-    const reserved = Ticket.reserve(id);
-
-    if (!reserved) {
-      return res.status(400).json({
-        success: false,
-        error: 'No se pudo reservar. El ticket no existe o ya está reservado',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Ticket reservado exitosamente',
-      data: reserved
-    });
+  static async update(req, res) {
+    try {
+      const data = await Ticket.update(req.params.id, req.body);
+      if (!data) return res.status(404).json({ success:false, error:'Ticket no encontrado' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static update(req, res) {
-    const { id } = req.params;
-    const { seatNumber, price } = req.body;
-
-    if (!seatNumber || !price) {
-      return res.status(400).json({
-        success: false,
-        error: 'Faltan campos requeridos para actualizar'
-      });
-    }
-
-    const updated = Ticket.update(id, seatNumber, price);
-
-    if (!updated) {
-      return res.status(404).json({
-        success: false,
-        error: 'Ticket no encontrado',
-        id: id
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Ticket actualizado exitosamente',
-      data: updated
-    });
+  static async delete(req, res) {
+    try {
+      const ok = await Ticket.delete(req.params.id);
+      if (!ok) return res.status(404).json({ success:false, error:'Ticket no encontrado' });
+      res.status(200).json({ success:true, message:'Ticket eliminado' });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
-
-  static delete(req, res) {
-    const { id } = req.params;
-
-    const deleted = Ticket.delete(id);
-
-    if (!deleted) {
-      return res.status(404).json({
-        success: false,
-        error: 'Ticket no encontrado',
-        id: id
-      });
-    }
-
-    // Eliminar reservación asociada
-    Reservation.deleteByTicket(id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Ticket eliminado exitosamente',
-      deletedId: id
-    });
+  static async reserve(req, res) {
+    try {
+      const data = await Ticket.reserve(req.params.id);
+      if (!data) return res.status(409).json({ success:false, error:'Ticket no disponible' });
+      res.status(200).json({ success:true, data });
+    } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
 }
-
 module.exports = TicketController;

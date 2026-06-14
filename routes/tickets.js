@@ -1,13 +1,13 @@
+'use strict';
 const express = require('express');
-const router = express.Router();
-const TicketController = require('../controllers/TicketController');
+const router  = express.Router();
+const C       = require('../controllers/TicketController');
 
-router.get('/', TicketController.getAll);
-router.get('/:functionId', TicketController.getByFunction);
-router.get('/:id', TicketController.getById);
-router.post('/', TicketController.create);
-router.post('/:id/reserve', TicketController.reserve);
-router.put('/:id', TicketController.update);
-router.delete('/:id', TicketController.delete);
-
+router.get('/function/:functionId', C.getByFunction);
+router.get('/',                     C.getAll);
+router.get('/:id',                  C.getById);
+router.post('/',                    C.create);
+router.post('/:id/reserve',         C.reserve);
+router.put('/:id',                  C.update);
+router.delete('/:id',               C.delete);
 module.exports = router;
