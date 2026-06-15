@@ -1,0 +1,38 @@
+<%- include('../partials/header', {title: title, active: 'reservations'}) %>
+
+  <div class="container">
+    <div class="section">
+      <h2>➕ Nueva Reservación</h2>
+      
+      <div class="card">
+        <form action="/reservations" method="POST">
+          <div class="form-group">
+            <label for="ticket_id">Ticket ID *</label>
+            <input type="text" id="ticket_id" name="ticket_id" required placeholder="Ej: d1e2f3a4-0001-4000-8000-000000000001">
+          </div>
+          
+          <div class="form-group">
+            <label for="user_name">Nombre del Usuario *</label>
+            <input type="text" id="user_name" name="user_name" required placeholder="Ej: Juan Pérez">
+          </div>
+          
+          <div class="form-group">
+            <label for="user_email">Email del Usuario *</label>
+            <input type="email" id="user_email" name="user_email" required placeholder="Ej: juan@example.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="notes">Notas (opcional)</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Ej: Asiento preferencial"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">💾 Crear Reservación</button>
+            <a href="/reservations/view" class="btn btn-secondary">❌ Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<%- include('../partials/footer') %>

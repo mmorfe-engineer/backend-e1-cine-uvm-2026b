@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Sistema de Gestión de Cine - UVM' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🎬 <%= title || 'Sistema de Gestión de Cine - UVM' %></h1>
+            <p class="subtitle">Backend 2026B - E-Actividad 2.1</p>
+        </div>
+    </header>
+    
+    <nav class="nav">
+        <div class="container">
+            <ul>
+                <li><a href="/" class="<%= active === 'home' ? 'active' : '' %>">🏠 Inicio</a></li>
+                <li><a href="/movies/view" class="<%= active === 'movies' ? 'active' : '' %>">🎥 Películas</a></li>
+                <li><a href="/rooms/view" class="<%= active === 'rooms' ? 'active' : '' %>">🎭 Salas</a></li>
+                <li><a href="/functions" class="<%= active === 'functions' ? 'active' : '' %>">📅 Funciones</a></li>
+                <li><a href="/tickets" class="<%= active === 'tickets' ? 'active' : '' %>">🎫 Tickets</a></li>
+                <li><a href="/reservations/view" class="<%= active === 'reservations' ? 'active' : '' %>">📋 Reservaciones</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="main">

@@ -42,5 +42,17 @@ class ReservationController {
       res.status(200).json({ success:true, message:'Reservación eliminada' });
     } catch(err) { res.status(500).json({ success:false, error:err.message }); }
   }
+  static async viewList(req, res) {
+    try { const reservations = await Reservation.findAll(); res.render('reservations/list', { title:'Gestión de Reservaciones', reservations }); }
+    catch(err) { res.status(500).send(err.message); }
+  }
+  static async viewNew(req, res) { res.render('reservations/new', { title:'Nueva Reservación' }); }
+  static async viewEdit(req, res) {
+    try {
+      const reservation = await Reservation.findById(req.params.id);
+      if (!reservation) return res.redirect('/reservations/view');
+      res.render('reservations/edit', { title:'Editar Reservación', reservation });
+    } catch(err) { res.status(500).send(err.message); }
+  }
 }
 module.exports = ReservationController;

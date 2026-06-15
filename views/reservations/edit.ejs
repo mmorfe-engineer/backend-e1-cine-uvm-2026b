@@ -1,0 +1,49 @@
+<%- include('../partials/header', {title: title, active: 'reservations'}) %>
+
+  <div class="container">
+    <div class="section">
+      <h2>✏️ Editar Reservación</h2>
+      
+      <div class="card">
+        <form action="/reservations/<%= reservation.id %>">
+          <input type="hidden" name="_method" value="PUT">
+          
+          <div class="form-group">
+            <label for="ticket_id">Ticket ID *</label>
+            <input type="text" id="ticket_id" name="ticket_id" value="<%= reservation.ticket_id %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="user_name">Nombre del Usuario *</label>
+            <input type="text" id="user_name" name="user_name" value="<%= reservation.user_name %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="user_email">Email del Usuario *</label>
+            <input type="email" id="user_email" name="user_email" value="<%= reservation.user_email %>">
+          </div>
+          
+          <div class="form-group">
+            <label for="status">Estado</label>
+            <select id="status" name="status">
+              <option value="active" <%= reservation.status === 'active' ? 'selected' : '' %>>Active</option>
+              <option value="cancelled" <%= reservation.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+              <option value="completed" <%= reservation.status === 'completed' ? 'selected' : '' %>>Completed</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="notes">Notas</label>
+            <textarea id="notes" name="notes" rows="3"><%= reservation.notes || '' %></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+            <a href="/reservations/view" class="btn btn-secondary">❌ Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<%- include('../partials/footer') %>

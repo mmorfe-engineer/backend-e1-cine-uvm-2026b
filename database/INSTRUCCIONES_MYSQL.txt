@@ -1,0 +1,78 @@
+=============================================================================
+INSTRUCCIONES PARA CONFIGURAR MySQL Y CREAR LA BASE DE DATOS cine_uvm
+=============================================================================
+
+PROBLEMA:
+--------
+MySQL instalado via snap usa autenticacion por socket (auth_socket plugin).
+Esto significa que el usuario root de MySQL solo puede ser accedido por el 
+usuario del sistema 'snap_daemon' usando sudo.
+
+SOLUCION RAPIDA (Recomendada):
+------------------------------
+Ejecutar el siguiente comando en una terminal:
+
+    sudo bash /home/bitcoinpapa/Documentos/cine_uvm/database/fix_mysql_auth.sh
+
+Este script automaticamente:
+1. Detiene MySQL
+2. Lo reinicia con --skip-grant-tables
+3. Cambia la autenticacion de root a contraseña
+4. Configura la contraseña como '1213'
+5. Crea la base de datos cine_uvm
+6. Otorga permisos a root
+7. Reinicia MySQL normalmente
+8. Verifica la conexion
+
+SOLUCION MANUAL (Si el script no funciona):
+------------------------------------------
+
+Paso 1: Detener MySQL
+   sudo snap stop mysql
+
+Paso 2: Iniciar MySQL con skip-grant-tables (en una terminal)
+   sudo /snap/mysql/54/usr/sbin/mysqld --skip-grant-tables \
+     --basedir=/snap/mysql/54/usr \
+     --datadir=/var/snap/mysql/common/data \
+     --plugin-dir=/snap/mysql/54/usr/lib/mysql/plugin \
+     --socket=/var/snap/mysql/54/run/mysqld.sock &
+
+Paso 3: En OTRA terminal, cambiar autenticacion de root
+   sudo /snap/bin/mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '1213';"
+   sudo /snap/bin/mysql -u root -e "UPDATE mysql.user SET plugin='mysql_native_password' WHERE User='root' AND Host='localhost';"
+   sudo /snap/bin/mysql -u root -e "FLUSH PRIVILEGES;"
+
+Paso 4: Detener MySQL temporal (Ctrl+C en la terminal del Paso 2)
+
+Paso 5: Iniciar MySQL normalmente
+   sudo snap start mysql
+
+Paso 6: Crear base de datos y otorgar permisos
+   sudo /snap/bin/mysql -u root -p1213 -e "CREATE DATABASE IF NOT EXISTS cine_uvm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   sudo /snap/bin/mysql -u root -p1213 -e "GRANT ALL PRIVILEGES ON cine_uvm.* TO 'root'@'localhost';"
+   sudo /snap/bin/mysql -u root -p1213 -e "FLUSH PRIVILEGES;"
+
+Paso 7: Verificar conexion
+   /snap/bin/mysql -u root -p1213 -e "SELECT 'MySQL listo!' AS status;"
+
+Paso 8: Ejecutar el schema de la base de datos
+   cd /home/bitcoinpapa/Documentos/cine_uvm
+   /snap/bin/mysql -u root -p1213 cine_uvm < database/schema.sql
+
+Paso 9: Verificar que las tablas se crearon
+   /snap/bin/mysql -u root -p1213 -e "USE cine_uvm; SHOW TABLES;"
+
+VERIFICACION FINAL:
+------------------
+   /snap/bin/mysql -u root -p1213 -e "SELECT COUNT(*) FROM cine_uvm.movies;"
+
+Deberia mostrar: 5 (peliculas insertadas en el schema)
+
+=============================================================================
+NOTAS:
+- La contraseña configurada sera: 1213
+- La base de datos sera: cine_uvm
+- El usuario sera: root
+- El puerto sera: 3306
+- El socket sera: /var/snap/mysql/54/run/mysqld.sock
+=============================================================================

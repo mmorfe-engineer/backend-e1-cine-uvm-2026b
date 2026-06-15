@@ -1,0 +1,59 @@
+<%- include('../partials/header', {title: title, active: 'reservations'}) %>
+
+  <div class="container">
+    <div class="section">
+      <h2>📋 Lista de Reservaciones</h2>
+      
+      <a href="/reservations/view/new" class="btn btn-primary">➕ Nueva Reservación</a>
+      
+      <% if (reservations && reservations.length > 0) { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Ticket</th>
+            <th>Asiento</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reservations.forEach(reservation => { %>
+          <tr>
+            <td><%= reservation.id.substring(0, 8) %>...</td>
+            <td><%= reservation.user_name %></td>
+            <td><%= reservation.user_email %></td>
+            <td><%= reservation.ticket_id.substring(0, 8) %>...</td>
+            <td><%= reservation.seat_number %></td>
+            <td>
+              <span class="badge badge-<%= reservation.status %>">
+                <%= reservation.status %>
+              </span>
+            </td>
+            <td><%= reservation.reservation_date ? new Date(reservation.reservation_date).toLocaleString() : 'N/A' %></td>
+            <td>
+              <a href="/reservations/view/<%= reservation.id %>/edit" class="btn btn-warning btn-sm">✏️ Editar</a>
+              <form action="/reservations/<%= reservation.id %>" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar reservación?')">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+              </form>
+              <form action="/reservations/<%= reservation.id %>/cancel" method="POST" style="display: inline;" onsubmit="return confirm('¿Cancelar reservación?')">
+                <button type="submit" class="btn btn-info btn-sm">🚫 Cancelar</button>
+              </form>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <% } else { %>
+      <div class="card">
+        <p>No hay reservaciones registradas. <a href="/reservations/view/new">Crear una nueva reservación</a>.</p>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+<%- include('../partials/footer') %>
