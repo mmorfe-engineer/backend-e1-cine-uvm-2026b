@@ -1,0 +1,157 @@
+# =============================================================================
+# PROMPT PARA CONFIGURAR RAILWAY CON REPOSITORIO CINE UVM 2026B
+# =============================================================================
+
+CONTEXTO:
+---------
+Soy el usuario Bitcoinpapa en Ubuntu. Tengo el proyecto "Sistema de Gestión de Cine UVM 2026B" 
+en /home/bitcoinpapa/Documentos/cine_uvm ya subido a GitHub en:
+https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
+
+El proyecto incluye:
+- Backend: Node.js + Express.js + EJS
+- Base de datos: MySQL (schema en database/schema.sql)
+- Archivos de Railway: railway.json y nixpacks.toml ya creados
+- config/db.js ya configurado para variables de entorno de Railway
+
+OBJETIVO:
+---------
+Necesito que me ayudes a deployar el backend en Railway.app paso a paso.
+
+DATOS ESPECÍFICOS:
+------------------
+- Repositorio: https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
+- Ruta local: /home/bitcoinpapa/Documentos/cine_uvm
+- Branch: main
+- Framework: Express.js
+- Database: MySQL 8.0
+- Driver: mysql2/promise
+- Puerto: 3000 (configurable en .env)
+
+ARCHIVOS IMPORTANTES:
+--------------------
+1. railway.json - Configuración de Railway
+2. nixpacks.toml - Configuración de build
+3. config/db.js - Conexión a MySQL (ya compatible con Railway)
+4. database/schema.sql - Schema de la base de datos
+5. package.json - Dependencias del proyecto
+6. app.js - Punto de entrada del servidor
+
+REQUERIMIENTOS:
+---------------
+1. Backend deployado en Railway con URL pública
+2. Base de datos MySQL en Railway
+3. Schema.sql ejecutado en la DB de Railway
+4. API accesible públicamente (ej: GET /movies)
+
+PASOS QUE NECESITO:
+-------------------
+
+PASO 1: CONFIGURAR CUENTA RAILWAY
+--------------------------------
+1. ¿Cómo crear una cuenta en Railway.app?
+2. ¿Cómo conectar mi cuenta GitHub a Railway?
+3. ¿Qué permisos necesito otorgar?
+
+PASO 2: CREAR PROYECTO EN RAILWAY
+---------------------------------
+1. ¿Cómo crear un nuevo proyecto en Railway?
+2. ¿Cómo seleccionar el repositorio backend-e1-cine-uvm-2026b?
+3. ¿Railway detecta automáticamente Node.js?
+4. ¿Qué configuración debo elegir?
+
+PASO 3: CONFIGURAR BASE DE DATOS MYSQL
+--------------------------------------
+1. ¿Cómo agregar un servicio MySQL al proyecto?
+2. ¿Qué versión de MySQL debo seleccionar?
+3. ¿Cómo acceder a la consola de MySQL en Railway?
+4. ¿Cómo ejecutar el archivo schema.sql?
+   - El schema.sql está en: /database/schema.sql
+   - Contiene: DROP DATABASE, CREATE DATABASE, CREATE TABLES, INSERT DATA
+
+PASO 4: DEPLOY DEL BACKEND
+--------------------------
+1. ¿Cómo iniciar el deploy?
+2. ¿Cómo saber cuando el deploy está listo?
+3. ¿Dónde encontrar la URL pública del backend?
+4. ¿Cómo verificar que el servidor está funcionando?
+
+PASO 5: VERIFICAR CONEXIÓN
+--------------------------
+1. ¿Cómo probar que la API funciona?
+   - GET http://[url-railway]/movies
+   - GET http://[url-railway]/functions/last5
+   - GET http://[url-railway]/functions/range?start=2026-06-14&end=2026-06-16
+2. ¿Cómo verificar que MySQL está conectado?
+3. ¿Qué hacer si la conexión a MySQL falla?
+
+PASO 6: SOLUCIONAR PROBLEMAS COMUNES
+-----------------------------------
+1. Si el deploy falla, ¿dónde ver los logs?
+2. Si MySQL no se conecta, ¿qué verificar?
+   - Las variables de entorno en Railway
+   - La configuración en config/db.js
+3. Si la API no responde, ¿qué revisar?
+
+REGLAS PARA LAS RESPUESTAS:
+---------------------------
+- NO menciones "Mistral", "AI", "IA", "ChatGPT" en NINGUNA respuesta
+- Usa lenguaje técnico claro y directo
+- Incluye comandos exactos para copiar/pegar
+- Si hay capturas de pantalla, descríbelas en texto
+- Explica cada paso con detalle
+- Incluye alternativas si algo no funciona
+- Usa formato markdown para mejor legibilidad
+
+CONFIGURACIÓN ACTUAL DE config/db.js:
+------------------------------------
+const pool = mysql.createPool({
+  host:     process.env.MYSQLHOST     || process.env.DB_HOST     || 'localhost',
+  port:     parseInt(process.env.MYSQLPORT || process.env.DB_PORT || '3306'),
+  user:     process.env.MYSQLUSER     || process.env.DB_USER     || 'root',
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME     || 'cine_uvm',
+  ssl: isRailway ? { rejectUnauthorized: false } : undefined,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+CONTENIDO DE railway.json:
+-------------------------
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "npm start",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+
+CONTENIDO DE nixpacks.toml:
+--------------------------
+[phases.build]
+cmds = ["npm install"]
+
+[start]
+cmd = "npm start"
+
+PREGUNTA FINAL:
+---------------
+Por favor, dime el paso a paso COMPLETO y DETALLADO para:
+1. Crear cuenta en Railway
+2. Conectar GitHub
+3. Deployar el proyecto backend-e1-cine-uvm-2026b
+4. Configurar MySQL en Railway
+5. Ejecutar schema.sql
+6. Verificar que todo funciona
+
+Incluye:
+- URLs exactas
+- Nombres de botones
+- Comandos a ejecutar
+- Qué esperar en cada paso
+- Cómo solucionar errores comunes

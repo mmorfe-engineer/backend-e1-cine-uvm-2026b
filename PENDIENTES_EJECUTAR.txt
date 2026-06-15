@@ -1,0 +1,193 @@
+================================================================================
+PENDIENTES PARA EJECUTAR MANUALMENTE - E-Actividad 2.1
+================================================================================
+
+IMPORTANTE: Estos comandos NO se pueden ejecutar automáticamente porque:
+- GitHub requiere autenticación SSH (la clave actual no tiene acceso)
+- GitHub Pages requiere configuración en el browser
+- Railway requiere configuración en el browser
+- El video requiere Thunder Client en VS Code
+
+================================================================================
+PENDIENTE 1: CONFIGURAR CLAVE SSH Y HACER PUSH
+================================================================================
+
+Paso 1: Configurar clave SSH en GitHub
+   1. Abrir: https://github.com/settings/keys
+   2. Click "New SSH key"
+   3. Title: "UVm Backend 2026B"
+   4. Key: copiar el contenido de ~/.ssh/id_ed25519.pub
+      Comando para ver la clave:
+        cat ~/.ssh/id_ed25519.pub
+   5. Click "Add SSH key"
+
+Paso 2: Hacer push a GitHub
+   cd /home/bitcoinpapa/Documentos/cine_uvm
+   git push origin main --tags
+
+Comando completo:
+   cd /home/bitcoinpapa/Documentos/cine_uvm && git push origin main --tags
+
+================================================================================
+PENDIENTE 2: ACTIVAR GITHUB PAGES
+================================================================================
+
+Paso 1: Ir a: https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
+Paso 2: Click "Settings" (tab superior)
+Paso 3: En el menú lateral, click "Pages" (bajo "Code and automation")
+Paso 4: En "Source", seleccionar: "Deploy from a branch"
+Paso 5: Branch: main / Folder: /docs
+Paso 6: Click "Save"
+Paso 7: Esperar 2-3 minutos
+Paso 8: Verificar en: https://mmorfe-engineer.github.io/backend-e1-cine-uvm-2026b
+
+================================================================================
+PENDIENTE 3: DEPLOY EN RAILWAY
+================================================================================
+
+Paso 1: Ir a: https://railway.app
+Paso 2: Login con GitHub (usar cuenta mmorfe-engineer)
+Paso 3: Click "New Project"
+Paso 4: Click "Deploy from GitHub repo"
+Paso 5: Buscar: backend-e1-cine-uvm-2026b
+Paso 6: Click "Deploy Now"
+Paso 7: Railway detecta Node.js y hace build automáticamente
+Paso 8: Esperar a que el build termine (debería ser "Success")
+Paso 9: Click "+ New" → "Database" → "Add MySQL"
+Paso 10: Railway crea la DB automáticamente
+Paso 11: En la DB de Railway → pestaña "Query"
+Paso 12: Copiar y pegar el contenido de /home/bitcoinpapa/Documentos/cine_uvm/database/schema.sql
+Paso 13: Click "Run" para ejecutar el schema
+Paso 14: Verificar en "Deployments" que está "Success"
+Paso 15: La URL será algo como: https://backend-e1-cine-uvm-2026b.up.railway.app
+Paso 16: Probar: https://[tu-dominio].up.railway.app/movies
+
+================================================================================
+PENDIENTE 4: GRABAR VIDEO CON THUNDER CLIENT
+================================================================================
+
+SECUENCIA DE PRUEBAS (30 peticiones para grabar):
+
+BASE URL: http://localhost:3000
+
+--- BLOQUE 1: MOVIES ---
+1. GET  /movies
+2. GET  /movies/a1b2c3d4-0001-4000-8000-000000000001
+3. POST /movies
+   Body: { "title":"Dune Part Two","duration":166,"genre":"Ciencia Ficción","rating":"PG-13" }
+4. PUT  /movies/a1b2c3d4-0001-4000-8000-000000000001
+   Body: { "title":"Inception: Remasterizada" }
+5. GET  /movies/a1b2c3d4-0001-4000-8000-000000000001/functions
+
+--- BLOQUE 2: ROOMS ---
+6. GET  /rooms
+7. GET  /rooms/b1c2d3e4-0001-4000-8000-000000000001
+8. POST /rooms
+   Body: { "name":"Sala Platinum","capacity":500,"type":"IMAX" }
+9. PUT  /rooms/b1c2d3e4-0005-4000-8000-000000000005
+   Body: { "capacity":250 }
+
+--- BLOQUE 3: FUNCTIONS ---
+10. GET  /functions
+11. GET  /functions/last5           ← FUNCIÓN COMPLEJA 1
+12. GET  /functions/range?start=2026-06-14&end=2026-06-16  ← FUNCIÓN COMPLEJA 2
+13. GET  /functions/c1d2e3f4-0001-4000-8000-000000000001
+14. POST /functions
+    Body: { "movie_id":"a1b2c3d4-0002-4000-8000-000000000002","room_id":"b1c2d3e4-0003-4000-8000-000000000003","date":"2026-06-20","time":"21:00:00","price":35.00,"available_seats":60 }
+15. PUT  /functions/c1d2e3f4-0001-4000-8000-000000000001
+    Body: { "price":28.00 }
+
+--- BLOQUE 4: TICKETS ---
+16. GET  /tickets
+17. GET  /tickets/function/c1d2e3f4-0001-4000-8000-000000000001
+18. GET  /tickets/d1e2f3a4-0001-4000-8000-000000000001
+19. POST /tickets
+    Body: { "function_id":"c1d2e3f4-0001-4000-8000-000000000001","seat_number":"Z99","price":25.50 }
+20. POST /tickets/d1e2f3a4-0002-4000-8000-000000000002/reserve
+
+--- BLOQUE 5: RESERVACIONES ---
+21. GET  /reservations
+22. GET  /reservations/e1f2a3b4-0001-4000-8000-000000000001
+23. POST /reservations
+    Body: { "ticket_id":"d1e2f3a4-0004-4000-8000-000000000004","user_name":"Ana Rodríguez","user_email":"ana@test.com" }
+24. POST /reservations/e1f2a3b4-0001-4000-8000-000000000001/cancel  ← FUNCIÓN COMPLEJA 3
+
+--- BLOQUE 6: OPERACIONES ESPECIALES ---
+25. DELETE /functions/c1d2e3f4-0006-4000-8000-000000000006/movie  ← DESVINCULAR
+26. GET  /functions/c1d2e3f4-0006-4000-8000-000000000006
+27. PUT  /reservations/e1f2a3b4-0002-4000-8000-000000000002
+    Body: { "notes":"Actualización de datos" }
+28. DELETE /tickets/d1e2f3a4-0005-4000-8000-000000000005
+29. DELETE /movies/a1b2c3d4-0005-4000-8000-000000000005
+30. GET  /movies  ← verificar soft-delete (Parasite no aparece)
+
+INSTRUCCIONES PARA GRABAR:
+- Mostrar la terminal y el Thunder Client
+- Explicar cada request
+- Mostrar las respuestas JSON
+- Duración: 7-12 minutos
+- Calidad: 1080p
+- Subir a YouTube con título: "E-Actividad 2.1 - Sistema de Gestión de Cine UVM"
+- Hashtags: #univalledelmomboy #tareaUVM
+
+================================================================================
+PENDIENTE 5: SUBIR VIDEO A YOUTUBE
+================================================================================
+
+1. Editar el video (opcional)
+2. Subir a YouTube
+3. Título: "E-Actividad 2.1 - Sistema de Gestión de Cine UVM Backend 2026B"
+4. Descripción: 
+   "Sistema backend para gestión de cine desarrollado con Node.js, Express.js y MySQL.
+   Universidad Valle del Momboy - Cátedra Backend 2026B.
+   Integrantes: Martín Morfe Flores, Martín Alejandro Carballo."
+5. Hashtags: #univalledelmomboy #tareaUVM #UVM #Backend2026B
+6. Visibilidad: Pública o No listada (según preferencia)
+
+================================================================================
+PENDIENTE 6: ENTREGAR INFORME TÉCNICO
+================================================================================
+
+El informe técnico debe incluir:
+1. Portada con datos del equipo
+2. Introducción
+3. Objetivos
+4. Metodología
+5. Arquitectura del sistema
+6. Tecnologías usadas
+7. Funcionalidades implementadas
+8. Pruebas realizadas
+9. Conclusiones
+10. Referencias
+
+Archivo base: /home/bitcoinpapa/Documentos/cine_uvm/docs/INFORME_DESARROLLO.md
+Puedes usar este archivo como base y complementarlo.
+
+================================================================================
+VERIFICACIÓN DE LO QUE YA ESTÁ LISTO
+================================================================================
+
+✅ Proyecto completo en /home/bitcoinpapa/Documentos/cine_uvm
+✅ MySQL funcionando con base de datos cine_uvm
+✅ Servidor local funcionando en http://localhost:3000
+✅ 16 commits locales realizados
+✅ Tag v1.0.0-evaluacion-1 creado
+✅ Todos los archivos de código generados
+✅ GitHub Pages: archivos en /docs
+✅ Railway: archivos configurados
+✅ Logs completos en /logs/
+
+================================================================================
+RESUMEN DE ACCIONES MANUALES REQUERIDAS
+================================================================================
+
+1. Configurar clave SSH en GitHub (1 min)
+2. Hacer push a GitHub (1 min)
+3. Activar GitHub Pages (2 min)
+4. Deploy en Railway (5 min)
+5. Grabar y subir video (15-20 min)
+6. Entregar informe técnico (30-60 min)
+
+Tiempo estimado total: 54-89 minutos
+
+================================================================================

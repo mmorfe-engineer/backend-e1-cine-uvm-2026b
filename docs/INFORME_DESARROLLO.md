@@ -16,11 +16,11 @@ Se desarrolló exitosamente el Sistema de Gestión de Cine como API REST complet
 | Fase | Descripción | Estado |
 |------|-------------|--------|
 | 1 | Preparación del entorno | ✅ |
-| 2 | Base de datos MySQL | ✅ (archivos creados) |
+| 2 | Base de datos MySQL | ✅ (ejecutado y verificado) |
 | 3 | Código del proyecto | ✅ |
-| 4 | Verificación local | ✅ |
-| 5 | GitHub — 14 commits | ✅ |
-| 6 | GitHub Pages | ✅ |
+| 4 | Verificación local | ✅ (servidor en http://localhost:3000) |
+| 5 | GitHub — 16 commits | ✅ (15 + 1 adicional) |
+| 6 | GitHub Pages | ✅ (archivos en /docs) |
 | 7 | Railway deployment | ✅ (configurado) |
 
 ## Endpoints Implementados
@@ -96,8 +96,8 @@ Se desarrolló exitosamente el Sistema de Gestión de Cine como API REST complet
 
 - **GitHub**: https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
 - **GitHub Pages**: https://mmorfe-engineer.github.io/backend-e1-cine-uvm-2026b
-- **Railway API**: (pendiente de deploy)
-- **Local**: http://localhost:3000
+- **Railway API**: (pendiente de deploy por usuario)
+- **Local**: http://localhost:3000 (✅ verificado y funcional)
 
 ## Commits Realizados
 
@@ -116,11 +116,12 @@ Se desarrolló exitosamente el Sistema de Gestión de Cine como API REST complet
 13. docs: update README with complete v2 documentation
 14. feat: add GitHub Pages landing page with API docs and team info
 15. feat: add Railway deployment config and cloud DB compatibility
+16. feat: add reservation CRUD views and partials templates
 
 ## Pendientes para el usuario
 
 1. ✅ Ejecutar `mysql -u root -p < database/schema.sql` para crear la base de datos
-2. ✅ Ejecutar `git push origin main --tags` para subir cambios a GitHub
+2. ⚠️  Ejecutar `git push origin main --tags` para subir cambios a GitHub (requiere clave SSH)
 3. ⏳ Activar GitHub Pages en Settings (branch: main, folder: /docs)
 4. ⏳ Configurar Railway y deploy del backend
 5. ⏳ Ejecutar schema.sql en Railway Query Console
