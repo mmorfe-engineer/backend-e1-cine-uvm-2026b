@@ -1,0 +1,15 @@
+<%- include('partials/layout', { title: title }) %>
+
+<div class="error-container">
+    <div class="error-card error-500">
+        <h1>500</h1>
+        <h2>Error del Servidor</h2>
+        <p><%= message || 'Ha ocurrido un error interno en el servidor. Por favor, intenta más tarde.' %></p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Volver al Inicio</a>
+            <a href="/movies" class="btn btn-secondary">Ver Cartelera</a>
+        </div>
+    </div>
+</div>
+
+<% include partials/footer %>

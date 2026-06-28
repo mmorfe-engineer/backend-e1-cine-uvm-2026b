@@ -331,3 +331,385 @@ code {
   font-size: 0.85rem;
   color: #81b9ff;
 }
+
+/* ============================================
+   ESTILOS PARA AUTENTICACIÓN (Trabajo 3)
+   ============================================ */
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: var(--surface);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.role-tag {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.role-admin {
+  background-color: var(--danger);
+  color: white;
+}
+
+.role-staff {
+  background-color: var(--warning);
+  color: #333;
+}
+
+.role-viewer {
+  background-color: var(--info);
+  color: white;
+}
+
+.btn-login, .btn-register, .btn-profile, .btn-logout {
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-login {
+  background-color: var(--info);
+  color: white;
+}
+
+.btn-login:hover {
+  background-color: #2980b9;
+}
+
+.btn-register {
+  background-color: var(--success);
+  color: white;
+}
+
+.btn-register:hover {
+  background-color: #27ae60;
+}
+
+.btn-profile {
+  background-color: var(--warning);
+  color: #333;
+}
+
+.btn-profile:hover {
+  background-color: #e67e22;
+}
+
+.btn-logout {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-logout:hover {
+  background-color: #c0392b;
+}
+
+/* Auth Container */
+.auth-container {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.auth-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.auth-subtitle {
+  color: var(--muted);
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--secondary);
+  color: var(--text);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-group input::placeholder {
+  color: #666;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #b2070f;
+}
+
+.btn-secondary {
+  background-color: var(--muted);
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #ccc;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+}
+
+.auth-link {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.auth-link a {
+  color: var(--info);
+  text-decoration: underline;
+}
+
+.auth-link a:hover {
+  color: #5dade2;
+}
+
+.alert {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.alert-error {
+  background-color: rgba(231, 76, 60, 0.15);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.alert-success {
+  background-color: rgba(46, 204, 113, 0.15);
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
+/* ============================================
+   ESTILOS PARA ERRORES
+   ============================================ */
+
+.error-container {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.error-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 40px;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.error-card h1 {
+  font-size: 6rem;
+  font-weight: bold;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.error-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: var(--text);
+}
+
+.error-card p {
+  color: var(--muted);
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-401 {
+  border-top: 4px solid var(--warning);
+}
+
+.error-403 {
+  border-top: 4px solid var(--danger);
+}
+
+.error-404 {
+  border-top: 4px solid var(--info);
+}
+
+.error-500 {
+  border-top: 4px solid var(--danger);
+}
+
+/* ============================================
+   ESTILOS PARA PERFIL
+   ============================================ */
+
+.profile-container {
+  padding: 40px 20px;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  justify-content: center;
+}
+
+.profile-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 40px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.profile-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  color: var(--text);
+}
+
+.profile-info {
+  margin-bottom: 30px;
+}
+
+.profile-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-field:last-child {
+  border-bottom: none;
+}
+
+.profile-field strong {
+  color: var(--muted);
+}
+
+.profile-field span {
+  color: var(--text);
+}
+
+.id-tag {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.profile-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .user-info {
+    flex-wrap: wrap;
+  }
+  
+  .auth-card,
+  .error-card,
+  .profile-card {
+    padding: 30px 20px;
+  }
+}

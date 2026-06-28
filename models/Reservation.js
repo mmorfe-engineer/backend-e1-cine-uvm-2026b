@@ -3,14 +3,14 @@ const { v4: uuidv4 } = require('uuid');
 const pool = require('../config/db');
 
 class Reservation {
-  static async create({ ticket_id, user_name, user_email, notes }) {
+  static async create({ ticket_id, user_id, user_name, user_email, notes }) {
     const id = uuidv4();
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
       await conn.query(
-        'INSERT INTO reservations (id,ticket_id,user_name,user_email,notes) VALUES (?,?,?,?,?)',
-        [id, ticket_id, user_name, user_email, notes||null]
+        'INSERT INTO reservations (id,ticket_id,user_id,user_name,user_email,notes) VALUES (?,?,?,?,?,?)',
+        [id, ticket_id, user_id, user_name, user_email, notes||null]
       );
       await conn.query("UPDATE tickets SET status='reserved' WHERE id=?", [ticket_id]);
       await conn.commit();
@@ -25,12 +25,14 @@ class Reservation {
     const [rows] = await pool.query(`
       SELECT res.*, t.seat_number, t.price AS ticket_price,
              f.date AS function_date, f.time AS function_time,
-             m.title AS movie_title, r.name AS room_name
+             m.title AS movie_title, r.name AS room_name,
+             u.name AS user_name, u.email AS user_email, u.role AS user_role
       FROM reservations res
       JOIN tickets t ON res.ticket_id=t.id
       JOIN functions f ON t.function_id=f.id
       LEFT JOIN movies m ON f.movie_id=m.id
       JOIN rooms r ON f.room_id=r.id
+      LEFT JOIN users u ON res.user_id = u.id
       ORDER BY res.created_at DESC`);
     return rows;
   }
@@ -39,11 +41,33 @@ class Reservation {
     const [rows] = await pool.query('SELECT * FROM reservations WHERE id=?', [id]);
     return rows[0] || null;
   }
+  
+  /**
+   * Busca reservaciones por usuario
+   * @param {string} userId - ID del usuario
+   * @returns {Promise<Array>} Reservaciones del usuario
+   */
+  static async findByUserId(userId) {
+    const [rows] = await pool.query(
+      `SELECT res.*, t.seat_number, t.price AS ticket_price,
+              f.date AS function_date, f.time AS function_time,
+              m.title AS movie_title, r.name AS room_name
+       FROM reservations res
+       JOIN tickets t ON res.ticket_id=t.id
+       JOIN functions f ON t.function_id=f.id
+       LEFT JOIN movies m ON f.movie_id=m.id
+       JOIN rooms r ON f.room_id=r.id
+       WHERE res.user_id=?
+       ORDER BY res.created_at DESC`,
+      [userId]
+    );
+    return rows;
+  }
 
-  static async update(id, { user_name, user_email, notes, status }) {
+  static async update(id, { user_id, user_name, user_email, notes, status }) {
     const [result] = await pool.query(
-      'UPDATE reservations SET user_name=COALESCE(?,user_name), user_email=COALESCE(?,user_email), notes=COALESCE(?,notes), status=COALESCE(?,status) WHERE id=?',
-      [user_name, user_email, notes, status, id]
+      'UPDATE reservations SET user_id=COALESCE(?,user_id), user_name=COALESCE(?,user_name), user_email=COALESCE(?,user_email), notes=COALESCE(?,notes), status=COALESCE(?,status) WHERE id=?',
+      [user_id, user_name, user_email, notes, status, id]
     );
     if (result.affectedRows === 0) return null;
     return Reservation.findById(id);

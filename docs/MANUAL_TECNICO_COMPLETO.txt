@@ -1,0 +1,990 @@
+================================================================================
+                   MANUAL TECNICO COMPLETO - SISTEMA DE GESTION DE CINE
+================================================================================
+                    Universidad Valle del Momboy (UVM) - Backend 2026B
+                              Trabajo 3: JWT + Roles + Migraciones
+================================================================================
+
+Autores:
+--------
+- Martin Morfe Flores (C.I. 8.263.711) - 40%
+- Martin Alejandro Morfe Carballo (C.I. 30.539.018) - 60%
+
+Fecha: 28 de Junio de 2026
+Repositorio: https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
+Stack: Node.js v14+ | Express 4.18.2 | MySQL 8.0 | EJS 3.1.9
+
+================================================================================
+                              INDICE GENERAL
+================================================================================
+
+1. INTRODUCCION Y METODOLOGIA AGIL
+2. ORGANIZACION DEL TRABAJO (SPRINTS SCRUM)
+3. ARQUITECTURA DEL SISTEMA
+4. ESPECIFICACIONES TECNICAS
+5. DOCTRINA Y CONCEPTOS POR AREA
+6. ESTRUCTURA DE ARCHIVOS
+7. IMPLEMENTACION DETALLADA
+8. SISTEMA DE AUTENTICACION JWT
+9. SISTEMA DE ROLES
+10. MIGRACIONES Y BASE DE DATOS
+11. VALIDACION Y SEGURIDAD
+12. DESPLIEGUE
+13. MANTENIMIENTO
+14. CODIGO FUENTE
+15. GLOSARIO TECNICO
+
+================================================================================
+1. INTRODUCCION Y METODOLOGIA AGIL
+================================================================================
+
+1.1. Descripcion del Proyecto
+----------------------------
+Sistema backend REST para gestion de cine con autenticacion JWT, roles y
+migraciones de BD. Desarrollado en 7 sprints usando metodologia Scrum.
+
+1.2. Objetivos del Trabajo 3
+---------------------------
+- Autenticacion JWT con bcrypt
+- Sistema de roles (admin, staff, viewer)
+- Migraciones de BD
+- Vistas EJS
+- Validacion de datos
+- Variables de entorno
+
+1.3. Metodologia Scrum
+----------------------
+- 7 Sprints (capas) de desarrollo
+- Daily standups virtuales
+- Revision de sprint al final de cada capa
+- Retrospectiva continua
+
+================================================================================
+2. ORGANIZACION DEL TRABAJO (SPRINTS SCRUM)
+================================================================================
+
+2.1. Roles del Equipo
+--------------------
+Martin Morfe Flores (Scrum Master / Arquitecto - 40%):
+  * Diseno de arquitectura MVC
+  * Modelado de BD MySQL
+  * Scripts de migracion (migrate.js, seed.js)
+  * Configuracion general (app.js base, .env, package.json)
+  * Documentacion (README.md, railway.json)
+
+Martin Alejandro Morfe Carballo (Dev Lead - 60%):
+  * Controladores en clases (AuthController, ReservationController)
+  * Middlewares (auth.js, roles.js)
+  * Sistema JWT completo
+  * Vistas EJS (auth/, errors/, partials/)
+  * Rutas con permisos (routes/auth.js, etc.)
+  * Estilos CSS
+
+2.2. Sprints de Desarrollo
+--------------------------
+Sprint 1 (Analisis): Diagnostico del repo existente
+Sprint 2 (Config): Variables de entorno, JWT config
+Sprint 3 (BD): Modelo User, schema.sql, migraciones
+Sprint 4 (Auth): JWT, bcrypt, login/register/logout
+Sprint 5 (Roles): Middleware de roles, permisos por ruta
+Sprint 6 (Vistas): EJS templates, layouts, errores
+Sprint 7 (Docs): Documentacion completa
+
+2.3. Division de Tareas por Autor
+---------------------------------
+
+Martin Morfe Flores (40% - 12 archivos):
+  - .env.example, config/db.js, config/jwt.js
+  - database/schema.sql, database/migrate.js, database/seed.js
+  - models/Reservation.js (modificado)
+  - app.js (base), package.json, railway.json
+  - README.md, readme.txt, docs/INFORME_DESARROLLO.md
+
+Martin Alejandro Morfe Carballo (60% - 28 archivos):
+  - models/User.js
+  - controllers/AuthController.js, controllers/ReservationController.js
+  - middlewares/auth.js, middlewares/roles.js
+  - routes/auth.js, routes/movies.js, routes/rooms.js
+  - routes/functions.js, routes/tickets.js, routes/reservations.js
+  - views/auth/login.ejs, views/auth/register.ejs, views/auth/profile.ejs
+  - views/errors/401.ejs, 403.ejs, 404.ejs, 500.ejs
+  - views/partials/layout.ejs, header.ejs, footer.ejs
+  - public/css/style.css
+
+2.4. Tiempo Estimado
+-------------------
+Total: ~21 dias de desarrollo
+- Martin Morfe Flores: ~9 dias
+- Martin Alejandro: ~12 dias
+
+================================================================================
+3. ARQUITECTURA DEL SISTEMA
+================================================================================
+
+3.1. Patron MVC
+---------------
+Modelo: User, Movie, Room, Function, Ticket, Reservation
+Vista: EJS templates (auth/, errors/, partials/)
+Controlador: AuthController, MovieController, etc.
+
+3.2. Capas
+---------
+1. Configuracion (config/): db.js, jwt.js
+2. Base de Datos (database/): schema.sql, migrate.js, seed.js
+3. Modelos (models/): User.js, Reservation.js, etc.
+4. Middlewares (middlewares/): auth.js, roles.js
+5. Controladores (controllers/): AuthController.js, etc.
+6. Rutas (routes/): auth.js, movies.js, etc.
+7. Vistas (views/): *.ejs
+8. Estaticos (public/): css/style.css
+
+3.3. Flujo de Solicitud
+----------------------
+Request -> app.js -> Middleware -> Routes -> Controller -> Model -> BD
+                          <-      Response (JSON o EJS)
+
+3.4. Integraciones
+-----------------
+- Express + EJS: Renderizado de vistas
+- mysql2/promise: Conexion a MySQL
+- bcrypt: Hash de contraseñas
+- jsonwebtoken: Generacion de tokens JWT
+- cookie-parser: Manejo de cookies
+- method-override: Soporte para PUT/DELETE
+
+================================================================================
+4. ESPECIFICACIONES TECNICAS
+================================================================================
+
+4.1. Stack Tecnologico
+----------------------
+Node.js v14+ (Runtime)
+Express 4.18.2 (Framework web)
+MySQL 8.0 (Base de datos)
+mysql2 3.6.5 (Driver BD)
+dotenv 16.0.0 (Variables de entorno)
+ejs 3.1.9 (Motor de plantillas)
+bcrypt 5.1.1 (Hash de contraseñas)
+jsonwebtoken 9.0.2 (JWT)
+cookie-parser 1.4.6 (Cookies)
+method-override 3.0.0 (HTTP Methods)
+nodemon 3.0.2 (Auto-reload en desarrollo)
+
+4.2. Requisitos del Sistema
+----------------------------
+SO: Windows 10+/macOS/Linux
+RAM: 2GB minimo, 4GB recomendado
+Node.js: v14+
+MySQL: 8.0+
+
+4.3. Variables de Entorno (.env)
+--------------------------------
+PORT=3000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=tu_contraseña
+DB_NAME=cine_uvm
+NODE_ENV=development
+JWT_SECRET=32+_caracteres_aleatorios
+JWT_EXPIRES_IN=1h
+
+4.4. Scripts npm
+---------------
+npm start: node app.js
+npm run dev: nodemon app.js
+npm run migrate: node database/migrate.js
+npm run seed: node database/seed.js
+
+================================================================================
+5. DOCTRINA Y CONCEPTOS POR AREA
+================================================================================
+
+5.1. Backend (Express + Node.js)
+--------------------------------
+PRINCIPIOS:
+- Separacion de responsabilidades (SoC)
+- DRY (Don't Repeat Yourself)
+- KISS (Keep It Simple, Stupid)
+- Stateless (JWT)
+
+PATRONES:
+- Middleware Pattern
+- MVC (Model-View-Controller)
+- Dependency Injection
+
+CONCEPTOS CLAVE:
+- Request/Response Cycle
+- Routing
+- Middleware Chain
+- Error Handling
+- Async/Await
+
+5.2. Base de Datos (MySQL)
+--------------------------
+PRINCIPIOS:
+- Normalizacion (3FN)
+- Integridad referencial (FK)
+- ACID (transacciones)
+- Indices para optimizacion
+
+CONCEPTOS CLAVE:
+- Tablas y relaciones
+- Claves primarias (UUID)
+- Claves foraneas (ON DELETE CASCADE)
+- Indices
+- Transacciones
+
+5.3. Autenticacion (JWT)
+-----------------------
+CONCEPTOS CLAVE:
+- Token: String firmado (header.payload.signature)
+- Header: {alg: 'HS256', typ: 'JWT'}
+- Payload: {sub: userId, name, email, role, exp}
+- Signature: HMAC-SHA256(base64UrlEncode(header) + '.' + base64UrlEncode(payload), secret)
+- Stateless: No requiere almacenar sesion en servidor
+- Expiracion: Token valido por tiempo limitado
+
+5.4. Seguridad
+--------------
+PRINCIPIOS:
+- Defense in Depth
+- Never Trust User Input
+- Principle of Least Privilege
+- Secure by Default
+
+IMPLEMENTACION:
+- bcrypt (cost: 10): Hash de contraseñas
+- JWT con secreto seguro: Autenticacion
+- Cookies HttpOnly/Secure: Proteccion XSS/CSRF
+- SQL Parameterized Queries: Prevenir SQL Injection
+- Validacion de entrada: Evitar datos maliciosos
+
+5.5. Vistas (EJS)
+-----------------
+CONCEPTOS CLAVE:
+- Template Engine: Motor de plantillas
+- Partials: Componentes reutilizables
+- Layout: Estructura base
+- Embedded JS: JavaScript en HTML
+- Tags: <%= %>, <%- %>, <% %>
+
+5.6. Middlewares
+----------------
+CONCEPTOS CLAVE:
+- req, res, next: Parametros del middleware
+- next(): Continua al siguiente middleware
+- res.end(): Termina el ciclo de vida
+- Order matters: Secuencia de ejecucion
+
+TIPOS:
+- Application-level: app.use()
+- Router-level: router.use()
+- Error-handling: (err, req, res, next)
+
+================================================================================
+6. ESTRUCTURA DE ARCHIVOS
+================================================================================
+
+backend-e1-cine-uvm-2026b/
+├── .env.example
+├── .gitignore
+├── app.js (Punto de entrada)
+├── package.json
+├── package-lock.json
+├── README.md
+├── readme.txt
+├── railway.json
+├── docs/
+│   ├── INFORME_DESARROLLO.md
+│   └── INFORME_TRABAJO_3.md
+├── config/
+│   ├── db.js (Conexion MySQL)
+│   └── jwt.js (Configuracion JWT)
+├── database/
+│   ├── schema.sql
+│   ├── migrate.js
+│   ├── seed.js
+│   └── INSTRUCCIONES_MYSQL.txt
+├── models/
+│   ├── User.js
+│   ├── Movie.js
+│   ├── Room.js
+│   ├── Function.js
+│   ├── Ticket.js
+│   └── Reservation.js
+├── controllers/
+│   ├── AuthController.js (CLASE)
+│   ├── MovieController.js
+│   ├── RoomController.js
+│   ├── FunctionController.js
+│   ├── TicketController.js
+│   └── ReservationController.js
+├── middlewares/
+│   ├── auth.js (JWT authentication)
+│   └── roles.js (Role authorization)
+├── routes/
+│   ├── auth.js
+│   ├── movies.js
+│   ├── rooms.js
+│   ├── functions.js
+│   ├── tickets.js
+│   └── reservations.js
+├── views/
+│   ├── index.ejs
+│   ├── auth/
+│   │   ├── login.ejs
+│   │   ├── register.ejs
+│   │   └── profile.ejs
+│   ├── errors/
+│   │   ├── 401.ejs
+│   │   ├── 403.ejs
+│   │   ├── 404.ejs
+│   │   └── 500.ejs
+│   └── partials/
+│       ├── layout.ejs
+│       ├── header.ejs
+│       └── footer.ejs
+└── public/
+    └── css/
+        └── style.css
+
+TOTAL: 36 archivos (16 modificados + 20 nuevos)
+
+================================================================================
+7. IMPLEMENTACION DETALLADA
+================================================================================
+
+7.1. Configuracion (config/)
+----------------------------
+
+config/db.js:
+- Crea pool de conexiones MySQL
+- Configura timeout y limites
+- Prueba conexion al iniciar
+
+config/jwt.js:
+- Exporta generateToken(user)
+- Exporta verifyToken(token)
+- Usa JWT_SECRET y JWT_EXPIRES_IN del .env
+- Advertencias si no hay configuracion
+
+7.2. Base de Datos (database/)
+-----------------------------
+
+schema.sql:
+- 6 tablas: users, movies, rooms, functions, tickets, reservations
+- users: id, name, email, password_hash, role, timestamps
+- reservations: incluye user_id (relacion con users)
+- Claves foraneas con ON DELETE CASCADE
+- Indices para optimizacion
+
+migrate.js:
+- Lee schema.sql
+- Ejecuta todas las sentencias
+- Crea BD y tablas
+- Muestra mensaje de exito
+
+seed.js:
+- Crea 3 usuarios de prueba:
+  * admin@cine.com / admin123 (admin)
+  * staff@cine.com / staff123 (staff)
+  * viewer@cine.com / viewer123 (viewer)
+
+7.3. Modelos (models/)
+------------------------
+
+User.js (NUEVO - Martin Alejandro):
+- Metodos: create, findById, findByEmail, findByEmailAndPassword
+- Validacion: email formato, password longitud, rol valido
+- bcrypt.hash(password, 10) para contraseñas
+- UUID para IDs
+
+Reservation.js (MODIFICADO - Martin Morfe):
+- Campo user_id añadido
+- Relacion con users tabla
+- Metodos: create, findById, findAll, findByUserId
+
+7.4. Middlewares (middlewares/)
+--------------------------------
+
+auth.js (NUEVO - Martin Alejandro):
+- extractToken(req): Busca token en header, cookies o body
+- authenticateToken(req, res, next): Verifica JWT, agrega req.user
+- optionalAuth(req, res, next): Autenticacion opcional para contexto
+
+roles.js (NUEVO - Martin Alejandro):
+- ROLE_PERMISSIONS: Matriz de permisos por rol
+- EXCLUSIVE_OPERATIONS: 3 operaciones exclusivas por rol
+- checkRole(allowedRoles): Middleware para verificar rol
+- checkPermission(requiredPermissions): Middleware para verificar permiso
+- checkOwnership(resourceType, paramName): Verifica dueño del recurso
+
+7.5. Controladores (controllers/)
+--------------------------------
+
+AuthController.js (NUEVO - Martin Alejandro - CLASE):
+- Static methods: viewLogin, viewRegister, viewProfile
+- register(): Crea usuario, genera token, maneja errores
+- login(): Verifica credenciales, genera token, guard en cookie
+- logout(): Limpia cookie
+- profile(): Muestra perfil del usuario autenticado
+- Validacion completa en todos los metodos
+- Respuestas JSON o EJS segun Accept header
+
+ReservationController.js (MODIFICADO - Martin Alejandro):
+- Integracion con user_id
+- getMyReservations(): Filtra por usuario autenticado
+
+7.6. Rutas (routes/)
+--------------------
+
+auth.js (NUEVO - Martin Alejandro):
+- GET /auth/login: Formulario de login
+- GET /auth/register: Formulario de registro
+- GET /auth/profile: Perfil (requiere auth)
+- POST /auth/login: Iniciar sesion
+- POST /auth/register: Registrar usuario
+- POST /auth/logout: Cerrar sesion
+
+Todas las rutas de entidades (MODIFICADAS - Martin Alejandro):
+- Middleware authenticateToken aplicado a rutas protegidas
+- Middleware checkRole/checkPermission aplicado
+- admin: CRUD completo en todas las entidades
+- staff: CRUD en tickets y reservations, R en movies/rooms
+- viewer: Solo lectura publica
+
+7.7. Vistas (views/)
+--------------------
+
+partials/layout.ejs (NUEVO - Martin Alejandro):
+- Estructura base HTML5
+- Incluye header y footer
+- Contenido dinamico con <%- body %>
+
+partials/header.ejs (MODIFICADO - Martin Alejandro):
+- Logo y navegacion
+- Contexto de usuario (si autenticado)
+- Enlaces condicionales segun login
+
+partials/footer.ejs (MODIFICADO - Martin Alejandro):
+- Informacion del proyecto
+- Autores y version
+
+Vistas de autenticacion (NUEVAS - Martin Alejandro):
+- login.ejs: Formulario con manejo de errores
+- register.ejs: Formulario con validacion
+- profile.ejs: Muestra informacion del usuario
+
+Vistas de error (NUEVAS - Martin Alejandro):
+- 401.ejs: No autorizado
+- 403.ejs: Prohibido (con mensaje de rol)
+- 404.ejs: No encontrado
+- 500.ejs: Error interno
+
+7.8. Punto de Entrada (app.js)
+------------------------------
+
+Configuracion:
+- Express con EJS
+- Middlewares: json, urlencoded, method-override, cookie-parser
+- optionalAuth middleware global para contexto de usuario
+- Rutas montadas: /auth, /movies, /rooms, /functions, /tickets, /reservations
+- Manejo de errores: 404 y 500 handlers
+- Servidor en PORT
+
+================================================================================
+8. SISTEMA DE AUTENTICACION JWT
+================================================================================
+
+8.1. Flujo de Autenticacion
+---------------------------
+
+REGISTRO:
+1. Usuario envia: name, email, password, role
+2. Servidor valida datos
+3. Servidor hashea password con bcrypt (10 rounds)
+4. Servidor crea usuario en BD
+5. Servidor genera JWT con payload: {sub: id, name, email, role}
+6. Servidor guarda JWT en cookie (HttpOnly, Secure)
+7. Servidor redirige a / o devuelve JSON
+
+LOGIN:
+1. Usuario envia: email, password
+2. Servidor busca usuario por email
+3. Servidor verifica password con bcrypt.compare()
+4. Servidor genera JWT
+5. Servidor guarda JWT en cookie
+6. Servidor redirige a / o devuelve JSON
+
+LOGOUT:
+1. Servidor limpia cookie 'token'
+2. Servidor redirige a /auth/login
+
+AUTENTICACION DE RUTAS:
+1. Cliente envia request con cookie 'token'
+2. Middleware extractToken() busca token en header/cookies/body
+3. Middleware authenticateToken() verifica token con jwt.verify()
+4. Si valido: agrega req.user = {sub, name, email, role}
+5. Si invalido: devuelve 401
+
+8.2. Estructura del Token JWT
+-----------------------------
+
+Header:
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+Payload:
+{
+  "sub": "user-uuid",
+  "name": "User Name",
+  "email": "user@example.com",
+  "role": "admin",
+  "iat": 1656400000,
+  "exp": 1656403600
+}
+
+Signature:
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  JWT_SECRET
+)
+
+8.3. Codigo Clave
+-----------------
+
+Generar token:
+```javascript
+const payload = { sub: user.id, name: user.name, email: user.email, role: user.role };
+const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+```
+
+Verificar token:
+```javascript
+try {
+  const user = jwt.verify(token, JWT_SECRET);
+  return user;
+} catch (err) {
+  return null; // Token invalido o expirado
+}
+```
+
+Guardar cookie:
+```javascript
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production'
+});
+```
+
+================================================================================
+9. SISTEMA DE ROLES
+================================================================================
+
+9.1. Definicion de Roles
+------------------------
+
+ROLES:
+- admin: Administrador del sistema
+- staff: Personal del cine (cajero)
+- viewer: Cliente/Visitante
+
+9.2. Matriz de Permisos
+-----------------------
+
+ADMIN (acciones exclusivas):
+✅ Crear/Actualizar/Eliminar peliculas
+✅ Crear/Actualizar/Eliminar salas
+✅ Crear/Actualizar/Eliminar funciones
+✅ Crear/Eliminar tickets
+✅ Crear/Eliminar reservaciones
+✅ Gestionar usuarios (CRUD)
+
+STAFF (acciones exclusivas):
+✅ Crear tickets
+✅ Reservar tickets
+✅ Crear/Cancelar reservaciones
+✅ Ver todas las reservaciones
+✅ Actualizar tickets
+
+VIEWER (acciones publicas):
+✅ Ver listado de peliculas
+✅ Ver detalles de peliculas
+✅ Ver listado de salas
+✅ Ver listado de funciones
+✅ Ver sus propias reservaciones
+
+9.3. Operaciones Exclusivas (Requisito Academico)
+------------------------------------------------
+
+ADMIN (3 exclusivas):
+1. movie:delete - Eliminar peliculas
+2. room:delete - Eliminar salas
+3. user:create - Crear usuarios
+
+STAFF (3 exclusivas):
+1. ticket:create - Crear tickets
+2. reservation:create - Crear reservaciones
+3. reservation:delete - Eliminar reservaciones
+
+VIEWER (3 publicas):
+1. GET /movies - Listar peliculas
+2. GET /functions - Listar funciones
+3. GET /movies/:id - Ver pelicula
+
+9.4. Middleware de Autorizacion
+-------------------------------
+
+Uso:
+```javascript
+// Solo admin
+router.delete('/movies/:id', authenticateToken, checkRole(['admin']), controller);
+
+// Admin o staff
+router.post('/tickets', authenticateToken, checkRole(['admin', 'staff']), controller);
+
+// Permiso especifico
+router.post('/movies', authenticateToken, checkPermission(['movie:create']), controller);
+```
+
+9.5. Matriz de Permisos en roles.js
+----------------------------------
+
+const ROLE_PERMISSIONS = {
+  admin: ['movie:create', 'movie:read', 'movie:update', 'movie:delete',
+          'room:create', 'room:read', 'room:update', 'room:delete',
+          'function:create', 'function:read', 'function:update', 'function:delete',
+          'ticket:create', 'ticket:read', 'ticket:update', 'ticket:delete',
+          'reservation:create', 'reservation:read', 'reservation:update', 'reservation:delete'],
+  staff: ['movie:read', 'room:read',
+          'function:read', 'function:create',
+          'ticket:create', 'ticket:read', 'ticket:update', 'ticket:delete',
+          'reservation:create', 'reservation:read', 'reservation:update', 'reservation:delete'],
+  viewer: ['movie:read', 'room:read', 'function:read', 'ticket:read', 'reservation:read']
+};
+
+================================================================================
+10. MIGRACIONES Y BASE DE DATOS
+================================================================================
+
+10.1. Schema de la BD (database/schema.sql)
+------------------------------------------
+
+Tablas:
+1. users: id, name, email, password_hash, role, created_at, updated_at
+2. movies: id, title, description, duration_minutes, release_year, genre, etc.
+3. rooms: id, name, capacity, type, screen_size, sound_system, etc.
+4. functions: id, movie_id, room_id, start_time, end_time, price, available_seats, status
+5. tickets: id, function_id, seat_number, price, status
+6. reservations: id, user_id, function_id, ticket_id, quantity, total_price, status
+
+Relaciones:
+- functions -> movies (FK movie_id)
+- functions -> rooms (FK room_id)
+- tickets -> functions (FK function_id)
+- reservations -> users (FK user_id)
+- reservations -> functions (FK function_id)
+- reservations -> tickets (FK ticket_id)
+
+10.2. Script de Migracion
+-------------------------
+
+Comando: npm run migrate
+
+Pasos:
+1. Lee schema.sql
+2. Se conecta a MySQL
+3. Ejecuta todas las sentencias SQL
+4. Crea la BD y todas las tablas
+5. Crea indices
+
+10.3. Script de Semillas
+-----------------------
+
+Comando: npm run seed
+
+Usuarios creados:
+- admin@cine.com / admin123 (admin)
+- staff@cine.com / staff123 (staff)
+- viewer@cine.com / viewer123 (viewer)
+
+10.4. Ejecucion en Produccion
+-----------------------------
+
+1. Crear usuario MySQL
+2. Crear BD: npm run migrate
+3. Cargar datos: npm run seed (opcional)
+4. Configurar .env
+5. Iniciar: npm start
+
+================================================================================
+11. VALIDACION Y SEGURIDAD
+================================================================================
+
+11.1. Validacion en el Frontend
+-------------------------------
+- Campos requeridos (required)
+- Formato de email (type="email")
+- Longitud minima (minlength)
+- Mensajes de error
+
+11.2. Validacion en el Backend
+------------------------------
+- AuthController.register():
+  * name, email, password requeridos
+  * email valido (regex)
+  * password >= 8 caracteres
+  * rol valido (admin, staff, viewer)
+  * email unico
+
+- User.create():
+  * Mismas validaciones
+  * bcrypt.hash(password, 10)
+
+11.3. Manejo de Errores
+-----------------------
+- Try/catch en cada metodo
+- Errores personalizados
+- Respuestas segun Accept header (JSON o EJS)
+- Middlewares de error (401, 403)
+- Handlers globales (404, 500)
+
+11.4. Medidas de Seguridad
+--------------------------
+
+1. Hash de Contraseñas:
+   - Algoritmo: bcrypt
+   - Cost: 10
+   - Salt: Automatico
+   - Result: 60 caracteres
+
+2. Tokens JWT:
+   - Secreto: 32+ caracteres aleatorios
+   - Expiracion: 1 hora (configurable)
+   - Algoritmo: HS256
+
+3. Cookies:
+   - HttpOnly: true (no accesible via JS)
+   - Secure: true en produccion (solo HTTPS)
+
+4. SQL Injection:
+   - Uso de parametros (?)
+   - mysql2 pool.query() con placeholders
+   - NUNCA concatenar strings
+
+5. CORS:
+   - No implementado (proyecto academico)
+   - Recomendacion para produccion: usar cors middleware
+
+================================================================================
+12. DESPLIEGUE
+================================================================================
+
+12.1. Despliegue Local
+----------------------
+
+Pasos:
+1. git clone https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b.git
+2. cd backend-e1-cine-uvm-2026b
+3. npm install
+4. Crear .env (ver .env.example)
+5. npm run migrate
+6. npm run seed (opcional)
+7. npm start
+
+Acceder: http://localhost:3000
+
+12.2. Despliegue en Railway
+--------------------------
+
+Pasos:
+1. Crear proyecto en Railway
+2. Conectar repositorio GitHub
+3. Configurar variables de entorno:
+   - DB_HOST, DB_PORT, DB_USER, DB_PASSWORD (proporcionados por Railway)
+   - DB_NAME=cine_uvm
+   - JWT_SECRET=generar_uno_seguro
+   - JWT_EXPIRES_IN=1h
+   - NODE_ENV=production
+4. Railway ejecuta automaticamente npm run migrate
+5. Desplegar
+
+12.3. Variables de Entorno
+--------------------------
+
+.ENVA EXAMPLE:
+PORT=3000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=tu_contraseña
+DB_NAME=cine_uvm
+NODE_ENV=development
+JWT_SECRET=genera_con_node_e_crypto_randomBytes_32_toString_hex
+JWT_EXPIRES_IN=1h
+
+IMPORTANTE: .env esta en .gitignore
+
+================================================================================
+13. MANTENIMIENTO
+================================================================================
+
+13.1. Guia de Mantenimiento
+---------------------------
+
+Tareas regulares:
+- npm outdated (verificar versiones)
+- npm update (actualizar)
+- npm audit (verificar seguridad)
+- npm audit fix (corregir vulnerabilidades)
+- Backup BD: mysqldump cine_uvm > backup.sql
+
+13.2. Agregar Nueva Funcionalidad
+---------------------------------
+
+Pasos:
+1. Crear modelo: models/NuevoModelo.js
+2. Crear controlador: controllers/NuevoController.js
+3. Crear rutas: routes/nuevo.js
+4. Aplicar middlewares de auth/roles
+5. Crear vistas: views/nuevo/*.ejs
+6. Agregar a app.js: app.use('/nuevo', require('./routes/nuevo'))
+7. Actualizar schema.sql
+8. Ejecutar npm run migrate
+9. Probar
+
+13.3. Actualizar Dependencias
+------------------------------
+
+1. npm outdated (ver versiones antiguas)
+2. npm update (actualizar todas)
+3. npm install paquete@version (actualizar especifica)
+4. Probar todo el sistema
+5. Verificar changelog de dependencias
+
+13.4. Solucion de Problemas
+--------------------------
+
+Problema: MySQL connection failed
+- Verificar credenciales en .env
+- Verificar MySQL en ejecucion
+- Verificar permisos de usuario
+
+Problema: JWT invalid
+- Verificar JWT_SECRET en .env
+- Verificar token no expirado
+- Iniciar sesion nuevamente
+
+Problema: 403 Forbidden
+- Verificar rol del usuario
+- Verificar permisos en middlewares/roles.js
+- Verificar autenticacion
+
+Problema: 404 Not Found
+- Verificar ruta en navegador
+- Verificar ruta definida en routes/
+- Verificar ruta montada en app.js
+
+Problema: Vistas no renderizan
+- Verificar archivo .ejs existe
+- Verificar datos pasados
+- Verificar Accept header
+
+================================================================================
+14. CODIGO FUENTE
+================================================================================
+
+Todos los archivos de codigo fuente estan disponibles en:
+https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b
+
+Archivos clave:
+- app.js: Punto de entrada
+- config/jwt.js: Configuracion JWT
+- controllers/AuthController.js: Controlador de autenticacion
+- middlewares/auth.js: Middleware JWT
+- middlewares/roles.js: Middleware de roles
+- database/schema.sql: Schema de BD
+- database/migrate.js: Script de migracion
+- routes/auth.js: Rutas de autenticacion
+- views/auth/login.ejs: Formulario login
+- views/auth/register.ejs: Formulario registro
+
+================================================================================
+15. GLOSARIO TECNICO
+================================================================================
+
+DEFINICIONES:
+------------
+
+API: Application Programming Interface. Conjunto de definiciones y protocolos
+    que permiten comunicacion entre aplicaciones.
+
+REST: Representational State Transfer. Estilo de arquitectura para sistemas
+     distribuidos que usa metodos HTTP (GET, POST, PUT, DELETE).
+
+JWT: JSON Web Token. Estandar RFC 7519 para crear tokens de acceso seguros.
+
+MVC: Model-View-Controller. Patron de diseno que separa aplicacion en:
+    Modelo (datos), Vista (presentacion), Controlador (logica).
+
+Middleware: Funcion que procesa solicitudes y respuestas en Express.
+
+ORM: Object-Relational Mapping. Tecnica para convertir datos entre objetos
+    y tablas de BD.
+
+CRUD: Create, Read, Update, Delete. Operaciones basicas de persistencia.
+
+bcrypt: Algoritmo de hash para contraseñas. Incluye salt automatico.
+
+CORS: Cross-Origin Resource Sharing. Mecanismo para permitir solicitudes
+     desde otros dominios.
+
+SQL Injection: Ataque que inserta codigo SQL malicioso en campos de entrada.
+
+CSRF: Cross-Site Request Forgery. Ataque que obliga a usuario a ejecutar
+     acciones no deseadas.
+
+Stateless: Sistema que no almacena informacion de sesion entre solicitudes.
+
+ACRONIMOS:
+---------
+
+UVM: Universidad Valle del Momboy
+API: Application Programming Interface
+REST: Representational State Transfer
+JWT: JSON Web Token
+MVC: Model-View-Controller
+CRUD: Create, Read, Update, Delete
+BD: Base de Datos
+RDBMS: Relational Database Management System
+SSL: Secure Sockets Layer
+TLS: Transport Layer Security
+HTTP: HyperText Transfer Protocol
+HTTPS: HyperText Transfer Protocol Secure
+JSON: JavaScript Object Notation
+SQL: Structured Query Language
+CSS: Cascading Style Sheets
+HTML: HyperText Markup Language
+NPM: Node Package Manager
+NODE: Node.js
+
+================================================================================
+                          FIN DEL MANUAL TECNICO
+================================================================================
+
+Este documento contiene toda la informacion necesaria para:
+- Entender la arquitectura del Sistema de Gestion de Cine
+- Mantener y actualizar el sistema
+- Agregar nuevas funcionalidades
+- Solucionar problemas comunes
+- Desplegar el sistema
+
+Para cualquier duda, contactar a:
+- Martin Morfe Flores: mmorfe.engineer@gmail.com
+- Martin Alejandro Morfe Carballo
+
+Repositorio oficial:
+https://github.com/mmorfe-engineer/backend-e1-cine-uvm-2026b

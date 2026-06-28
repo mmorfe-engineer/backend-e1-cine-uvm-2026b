@@ -1,0 +1,40 @@
+<%- include('partials/layout', { title: title }) %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>🔑 Iniciar Sesión</h2>
+        <p class="auth-subtitle">Sistema de Gestión de Cine - UVM</p>
+        
+        <% if (error) { %>
+            <div class="alert alert-error">
+                ⚠️ <%= error %>
+            </div>
+        <% } %>
+        
+        <% if (success) { %>
+            <div class="alert alert-success">
+                ✅ <%= success %>
+            </div>
+        <% } %>
+        
+        <form action="/auth/login" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="tucorreo@ejemplo.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required placeholder="Tu contraseña">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+        </form>
+        
+        <p class="auth-link">
+            ¿No tienes cuenta? <a href="/auth/register">Regístrate aquí</a>
+        </p>
+    </div>
+</div>
+
+<% include partials/footer %>

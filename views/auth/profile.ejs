@@ -1,0 +1,48 @@
+<%- include('partials/layout', { title: title }) %>
+
+<div class="profile-container">
+    <div class="profile-card">
+        <h2>👤 Mi Perfil</h2>
+        
+        <div class="profile-info">
+            <div class="profile-field">
+                <strong>Nombre:</strong>
+                <span><%= user.name %></span>
+            </div>
+            
+            <div class="profile-field">
+                <strong>Email:</strong>
+                <span><%= user.email %></span>
+            </div>
+            
+            <div class="profile-field">
+                <strong>Rol:</strong>
+                <span class="role-tag role-<%= user.role %>"><%= user.role %></span>
+            </div>
+            
+            <div class="profile-field">
+                <strong>ID de Usuario:</strong>
+                <span class="id-tag"><%= user.id %></span>
+            </div>
+            
+            <div class="profile-field">
+                <strong>Estado:</strong>
+                <span><%= user.is_active ? 'Activo' : 'Inactivo' %></span>
+            </div>
+            
+            <div class="profile-field">
+                <strong>Fecha de Registro:</strong>
+                <span><%= user.created_at ? new Date(user.created_at).toLocaleDateString('es-VE') : 'N/A' %></span>
+            </div>
+        </div>
+        
+        <div class="profile-actions">
+            <a href="/" class="btn btn-secondary">Volver al Inicio</a>
+            <form action="/auth/logout" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<% include partials/footer %>

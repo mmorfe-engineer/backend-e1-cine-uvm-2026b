@@ -1,0 +1,15 @@
+<%- include('partials/layout', { title: title }) %>
+
+<div class="error-container">
+    <div class="error-card error-404">
+        <h1>404</h1>
+        <h2>Página No Encontrada</h2>
+        <p><%= message || 'La página que estás buscando no existe.' %></p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Volver al Inicio</a>
+            <a href="/movies" class="btn btn-secondary">Ver Cartelera</a>
+        </div>
+    </div>
+</div>
+
+<% include partials/footer %>

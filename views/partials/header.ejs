@@ -1,30 +1,42 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'Sistema de Gestión de Cine - UVM' %></title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1>🎬 <%= title || 'Sistema de Gestión de Cine - UVM' %></h1>
-            <p class="subtitle">Backend 2026B - E-Actividad 2.1</p>
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🎬 <%= title || 'Sistema de Gestión de Cine - UVM' %></h1>
+                <p class="subtitle">Backend 2026B - Trabajo 3</p>
+            </div>
+            <div class="user-info">
+                <% if (user) { %>
+                    <span class="user-badge">
+                        <strong><%= user.name %></strong>
+                        <span class="role-tag role-<%= user.role %>"><%= user.role %></span>
+                    </span>
+                    <a href="/auth/profile" class="btn-profile">Mi Perfil</a>
+                    <form action="/auth/logout" method="POST" style="display: inline;">
+                        <button type="submit" class="btn-logout">Cerrar Sesión</button>
+                    </form>
+                <% } else { %>
+                    <a href="/auth/login" class="btn-login">Iniciar Sesión</a>
+                    <a href="/auth/register" class="btn-register">Registrarse</a>
+                <% } %>
+            </div>
         </div>
-    </header>
-    
-    <nav class="nav">
-        <div class="container">
-            <ul>
-                <li><a href="/" class="<%= active === 'home' ? 'active' : '' %>">🏠 Inicio</a></li>
-                <li><a href="/movies/view" class="<%= active === 'movies' ? 'active' : '' %>">🎥 Películas</a></li>
-                <li><a href="/rooms/view" class="<%= active === 'rooms' ? 'active' : '' %>">🎭 Salas</a></li>
-                <li><a href="/functions" class="<%= active === 'functions' ? 'active' : '' %>">📅 Funciones</a></li>
-                <li><a href="/tickets" class="<%= active === 'tickets' ? 'active' : '' %>">🎫 Tickets</a></li>
-                <li><a href="/reservations/view" class="<%= active === 'reservations' ? 'active' : '' %>">📋 Reservaciones</a></li>
-            </ul>
-        </div>
-    </nav>
-    
-    <main class="main">
+    </div>
+</header>
+
+<nav class="nav">
+    <div class="container">
+        <ul>
+            <li><a href="/" class="<%= active === 'home' ? 'active' : '' '">🏠 Inicio</a></li>
+            <li><a href="/movies/view" class="<%= active === 'movies' ? 'active' : '' '">🎥 Películas</a></li>
+            <li><a href="/rooms/view" class="<%= active === 'rooms' ? 'active' : '' '">🎭 Salas</a></li>
+            <li><a href="/functions" class="<%= active === 'functions' ? 'active' : '' '">📅 Funciones</a></li>
+            <% if (user) { %>
+                <li><a href="/tickets" class="<%= active === 'tickets' ? 'active' : '' '">🎫 Tickets</a></li>
+                <li><a href="/reservations/view" class="<%= active === 'reservations' ? 'active' : '' '">📋 Reservaciones</a></li>
+            <% } %>
+        </ul>
+    </div>
+</nav>
+
+<main class="main">

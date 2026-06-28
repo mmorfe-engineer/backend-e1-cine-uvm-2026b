@@ -1,0 +1,50 @@
+<%- include('partials/layout', { title: title }) %>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>📝 Registro de Usuario</h2>
+        <p class="auth-subtitle">Sistema de Gestión de Cine - UVM</p>
+        
+        <% if (error) { %>
+            <div class="alert alert-error">
+                ⚠️ <%= error %>
+            </div>
+        <% } %>
+        
+        <form action="/auth/register" method="POST">
+            <div class="form-group">
+                <label for="name">Nombre Completo</label>
+                <input type="text" id="name" name="name" required 
+                       placeholder="Tu nombre" value="<%= old ? old.name : '' %>">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="tucorreo@ejemplo.com" value="<%= old ? old.email : '' %>">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña (mínimo 8 caracteres)</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Tu contraseña" minlength="8">
+            </div>
+            
+            <div class="form-group">
+                <label for="role">Rol</label>
+                <select id="role" name="role">
+                    <option value="viewer" <%= old && old.role === 'viewer' ? 'selected' : '' %>>Viewer (Solo ver)</option>
+                    <option value="staff" <%= old && old.role === 'staff' ? 'selected' : '' %>>Staff (Gestión)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+        </form>
+        
+        <p class="auth-link">
+            ¿Ya tienes cuenta? <a href="/auth/login">Inicia sesión aquí</a>
+        </p>
+    </div>
+</div>
+
+<% include partials/footer %>

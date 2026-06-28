@@ -1,12 +1,28 @@
 -- ============================================================
 --  SISTEMA DE GESTIÓN DE CINE - UVM BACKEND 2026B
---  E-Actividad 2.1 - Almacenamiento e Interfaces
+--  Trabajo 3 - Autenticación JWT + Roles + Migraciones
 --  Autores: Martín Morfe Flores / Martín Alejandro Carballo
 -- ============================================================
 
 DROP DATABASE IF EXISTS cine_uvm;
 CREATE DATABASE cine_uvm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE cine_uvm;
+
+-- ============================================================
+-- TABLA USERS (Nueva para Trabajo 3 - Autenticación)
+-- ============================================================
+CREATE TABLE users (
+  id            VARCHAR(36)   NOT NULL,
+  name          VARCHAR(255)  NOT NULL,
+  email         VARCHAR(255)  NOT NULL,
+  password_hash VARCHAR(255)  NOT NULL,
+  role          ENUM('admin','staff','viewer') NOT NULL DEFAULT 'viewer',
+  is_active     TINYINT(1)    NOT NULL DEFAULT 1,
+  created_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT pk_users PRIMARY KEY (id),
+  CONSTRAINT uq_user_email UNIQUE (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE movies (
   id            VARCHAR(36)   NOT NULL,
@@ -82,6 +98,7 @@ CREATE TABLE tickets (
 CREATE TABLE reservations (
   id               VARCHAR(36)  NOT NULL,
   ticket_id        VARCHAR(36)  NOT NULL,
+  user_id         VARCHAR(36)   NOT NULL,
   user_name        VARCHAR(255) NOT NULL,
   user_email       VARCHAR(255) NOT NULL,
   status           VARCHAR(20)  NOT NULL DEFAULT 'active',
@@ -91,6 +108,7 @@ CREATE TABLE reservations (
   updated_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT pk_reservations PRIMARY KEY (id),
   CONSTRAINT fk_res_ticket   FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_res_user     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT chk_res_status  CHECK (status IN ('active','cancelled','completed'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -104,6 +122,7 @@ CREATE INDEX idx_ticket_status      ON tickets (status);
 CREATE INDEX idx_ticket_func_status ON tickets (function_id, status);
 CREATE INDEX idx_res_email          ON reservations (user_email);
 CREATE INDEX idx_res_status         ON reservations (status);
+CREATE INDEX idx_res_user          ON reservations (user_id);
 
 -- VISTAS SQL
 CREATE VIEW v_functions_full AS
@@ -128,16 +147,29 @@ INNER JOIN rooms    r ON f.room_id      = r.id;
 CREATE VIEW v_reservations_full AS
 SELECT res.id AS reservation_id, res.user_name, res.user_email,
        res.status AS reservation_status, res.reservation_date,
+       u.id AS user_id, u.name AS user_name, u.role AS user_role,
        t.id AS ticket_id, t.seat_number, t.price AS ticket_price,
        f.date AS function_date, f.time AS function_time,
        m.title AS movie_title, r.name AS room_name
 FROM reservations res
 INNER JOIN tickets   t ON res.ticket_id = t.id
+INNER JOIN users    u ON res.user_id = u.id
 INNER JOIN functions f ON t.function_id = f.id
 LEFT  JOIN movies    m ON f.movie_id    = m.id
 INNER JOIN rooms     r ON f.room_id     = r.id;
 
 -- SEED DATA
+-- Usuarios (Nuevo para Trabajo 3)
+-- NOTE: password_hash es generado por bcrypt, estos son placeholders
+-- En producción, usar: bcrypt.hashSync('password', 10)
+-- ============================================================
+INSERT INTO users (id, name, email, password_hash, role) VALUES
+('f1e2d3c4-0001-4000-8000-000000000001', 'Admin UVM', 'admin@cine-uvm.edu.ve', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MH9J7D5Q4Ef7J5SAeYt2LxRqZJwL', 'admin'),
+('f1e2d3c4-0002-4000-8000-000000000002', 'Martín Morfe', 'mmorfe@cine-uvm.edu.ve', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MH9J7D5Q4Ef7J5SAeYt2LxRqZJwL', 'admin'),
+('f1e2d3c4-0003-4000-8000-000000000003', 'Martín Alejandro', 'mcarballo@cine-uvm.edu.ve', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MH9J7D5Q4Ef7J5SAeYt2LxRqZJwL', 'staff'),
+('f1e2d3c4-0004-4000-8000-000000000004', 'Taquilla UVM', 'taquilla@cine-uvm.edu.ve', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MH9J7D5Q4Ef7J5SAeYt2LxRqZJwL', 'staff'),
+('f1e2d3c4-0005-4000-8000-000000000005', 'Cliente Prueba', 'cliente@test.com', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MH9J7D5Q4Ef7J5SAeYt2LxRqZJwL', 'viewer');
+
 INSERT INTO movies (id, title, genre, duration, rating, synopsis, director, release_year) VALUES
 ('a1b2c3d4-0001-4000-8000-000000000001','Inception','Ciencia Ficción',148,'PG-13','Un ladrón que roba secretos corporativos mediante tecnología de compartir sueños.','Christopher Nolan',2010),
 ('a1b2c3d4-0002-4000-8000-000000000002','Avengers: Endgame','Acción',181,'PG-13','Los Avengers intentan revertir los daños causados por Thanos.','Anthony Russo',2019),
@@ -167,12 +199,14 @@ INSERT INTO tickets (id, function_id, seat_number, price, status, holder_name) V
 ('d1e2f3a4-0004-4000-8000-000000000004','c1d2e3f4-0003-4000-8000-000000000003','VIP-1',45.00,'available',NULL),
 ('d1e2f3a4-0005-4000-8000-000000000005','c1d2e3f4-0004-4000-8000-000000000004','C10',30.00,'available',NULL);
 
-INSERT INTO reservations (id, ticket_id, user_name, user_email, status, notes) VALUES
-('e1f2a3b4-0001-4000-8000-000000000001','d1e2f3a4-0001-4000-8000-000000000001','Juan Pérez','juan.perez@email.com','active','Solicita asiento central'),
-('e1f2a3b4-0002-4000-8000-000000000002','d1e2f3a4-0003-4000-8000-000000000003','María García','maria.garcia@email.com','completed',NULL);
+-- Reservations actualizadas con user_id
+INSERT INTO reservations (id, ticket_id, user_id, user_name, user_email, status, notes) VALUES
+('e1f2a3b4-0001-4000-8000-000000000001','d1e2f3a4-0001-4000-8000-000000000001','f1e2d3c4-0005-4000-8000-000000000005','Juan Pérez','juan.perez@email.com','active','Solicita asiento central'),
+('e1f2a3b4-0002-4000-8000-000000000002','d1e2f3a4-0003-4000-8000-000000000003','f1e2d3c4-0003-4000-8000-000000000003','María García','maria.garcia@email.com','completed',NULL);
 
 -- VERIFICATION
-SELECT 'movies' AS tabla, COUNT(*) AS registros FROM movies
+SELECT 'users' AS tabla, COUNT(*) AS registros FROM users
+UNION ALL SELECT 'movies', COUNT(*) FROM movies
 UNION ALL SELECT 'rooms', COUNT(*) FROM rooms
 UNION ALL SELECT 'functions', COUNT(*) FROM functions
 UNION ALL SELECT 'tickets', COUNT(*) FROM tickets

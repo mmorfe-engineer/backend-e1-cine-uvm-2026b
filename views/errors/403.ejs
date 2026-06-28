@@ -1,0 +1,17 @@
+<%- include('partials/layout', { title: title }) %>
+
+<div class="error-container">
+    <div class="error-card error-403">
+        <h1>403</h1>
+        <h2>Prohibido</h2>
+        <p><%= message || 'No tienes permisos suficientes para acceder a esta página.' %></p>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Volver al Inicio</a>
+            <% if (user) { %>
+                <a href="/auth/profile" class="btn btn-secondary">Ver mi perfil</a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<% include partials/footer %>
