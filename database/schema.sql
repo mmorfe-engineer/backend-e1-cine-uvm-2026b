@@ -1,7 +1,7 @@
 -- ============================================================
---  SISTEMA DE GESTIÓN DE CINE - UVM BACKEND 2026B
---  Trabajo 3 - Autenticación JWT + Roles + Migraciones
---  Autores: Martín Morfe Flores / Martín Alejandro Carballo
+-- SISTEMA DE GESTIÓN DE CINE - UVM BACKEND 2026B
+-- Trabajo 3 - Autenticación JWT + Roles + Migraciones
+-- Autores: Martín Morfe Flores / Martín Alejandro Carballo
 -- ============================================================
 
 DROP DATABASE IF EXISTS cine_uvm;
@@ -40,7 +40,7 @@ CREATE TABLE movies (
   CONSTRAINT pk_movies    PRIMARY KEY (id),
   CONSTRAINT chk_duration CHECK (duration > 0),
   CONSTRAINT chk_rating   CHECK (rating IN ('G','PG','PG-13','R','NC-17'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE rooms (
   id                VARCHAR(36)  NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE rooms (
   CONSTRAINT uq_room_name  UNIQUE (name),
   CONSTRAINT chk_capacity  CHECK (capacity > 0),
   CONSTRAINT chk_room_type CHECK (type IN ('Regular','IMAX','3D','4DX','VIP'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE functions (
   id               VARCHAR(36)   NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE functions (
   CONSTRAINT chk_avail      CHECK (available_seats >= 0),
   CONSTRAINT chk_format     CHECK (format IN ('2D','3D','IMAX','4DX')),
   CONSTRAINT chk_f_status   CHECK (status IN ('scheduled','ongoing','finished','cancelled'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE tickets (
   id           VARCHAR(36)   NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE tickets (
   CONSTRAINT uq_ticket_seat    UNIQUE (function_id, seat_number),
   CONSTRAINT chk_ticket_price  CHECK (price >= 0),
   CONSTRAINT chk_ticket_status CHECK (status IN ('available','reserved','sold','cancelled'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE reservations (
   id               VARCHAR(36)  NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE reservations (
   CONSTRAINT fk_res_ticket   FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_res_user     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT chk_res_status  CHECK (status IN ('active','cancelled','completed'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- INDEXES
 CREATE INDEX idx_movies_genre       ON movies (genre);
